@@ -16,6 +16,7 @@ public class Game {
 
     //region КОНСТРУКТОРЫ
 
+    //TODO несоответствие диаграмме(оставила бы как в коде)
     public Game(Labyrinth labyrinth) {
         start(labyrinth);
     }
@@ -34,7 +35,7 @@ public class Game {
 
         gameField = labyrinth.createField();
 
-        gameField.addFieldActionListener(new FieldObserver());
+        gameField.addFieldActionListener(new FieldObserver()); // как будто странная последовательность
 
         if (gameField == null) {
             throw new RuntimeException("No field created");

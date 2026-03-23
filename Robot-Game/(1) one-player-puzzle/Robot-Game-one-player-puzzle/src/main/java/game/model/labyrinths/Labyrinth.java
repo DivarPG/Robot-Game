@@ -87,6 +87,7 @@ public abstract class Labyrinth {
      *
      * @param field поле.
      */
+    //TODO странная реализация
     private void populateBatteries(@NotNull Field field) {
         Map<Battery, AbstractCell> batteries = createBatteries(field);
 

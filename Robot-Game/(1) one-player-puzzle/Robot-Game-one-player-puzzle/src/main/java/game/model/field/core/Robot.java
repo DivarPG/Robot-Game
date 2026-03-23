@@ -77,7 +77,7 @@ public class Robot extends CellObject {
     public boolean isCapable() {
         if (getPosition() instanceof NormalCell) {
             NormalCell cell = (NormalCell) getPosition();
-            if (cell.getSmallObject() != null) {
+            if (cell.getSmallObject() != null) { //todo не завершает игру при нахождении робота(0з) в ячейке с батарейкой(0з)
                 return true;
             }
         }
