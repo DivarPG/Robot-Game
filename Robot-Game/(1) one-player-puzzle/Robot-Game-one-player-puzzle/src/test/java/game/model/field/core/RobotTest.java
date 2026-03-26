@@ -1,11 +1,11 @@
 package game.model.field.core;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import game.model.events.RobotActionEvent;
 import game.model.events.RobotActionListener;
 import game.model.field.between_cells_objects.WallSegment;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +13,17 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+/* Аспекты тестирования
+ * Размещение робота: возможность размещения робота в пустой ячейке, запрет размещения в ячейке с другим роботом, возможность размещения в ячейке с батареей
+ * Перемещение робота: перемещение в соседнюю ячейку при наличии пути, обновление позиции робота после перемещения, освобождение предыдущей ячейки
+ * Ограничения перемещения: отсутствие перемещения при отсутствии соседней ячейки, отсутствие перемещения при наличии стены, отсутствие перемещения при недостаточном заряде
+ * Расход заряда: уменьшение заряда при успешном перемещении, отсутствие расхода заряда при невозможности перемещения
+ * События перемещения: генерация события при успешном перемещении, отсутствие событий при неуспешных действиях
+ * Работа с батареей: замена батареи при наличии батареи в ячейке, отсутствие изменений при отсутствии батареи в ячейке
+ * Состояние робота: сохранение активности робота при достаточных условиях, возможность функционирования при нулевом заряде при наличии батареи в ячейке
+ * Граничные случаи: попытка перемещения в недоступном направлении, попытка действий при нулевом заряде, отсутствие батареи для замены
+ */
 
 class RobotTest {
 
@@ -29,7 +40,7 @@ class RobotTest {
         }
 
         @Override
-        public void robotChangedBattery(@NotNull RobotActionEvent event) {
+        public void robotChangedBattery(@NotNull RobotActionEvent event) { // !!?
             // Not implemented yet
         }
     }
@@ -40,7 +51,7 @@ class RobotTest {
 
     private final static int DEFAULT_TEST_BATTERY_CHARGE = 10;
     private static final int AMOUNT_OF_CHARGE_FOR_MOVE = 1;
-    private static final int AMOUNT_OF_CHARGE_FOR_SKIP_STEP = 2;
+    private static final int AMOUNT_OF_CHARGE_FOR_SKIP_STEP = 2; // !!!
 
     private Robot robot;
 
@@ -118,7 +129,7 @@ class RobotTest {
         abstractCell.setBigObject(robot);
         abstractCell.setNeighborObstacle(direction, new WallSegment());
 
-        robot.setBattery(new Battery());
+        robot.setBattery(new Battery()); // робот уже имеет батарею из @BeforeEach
         robot.move(direction);
 
         assertEquals(robot, abstractCell.getBigObject());

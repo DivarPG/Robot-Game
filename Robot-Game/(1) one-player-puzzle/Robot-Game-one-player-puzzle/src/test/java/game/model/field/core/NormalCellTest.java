@@ -4,9 +4,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class NormalCellTest {
+/* Аспекты тестирования
+ * Малый объект в ячейке: установка батареи в пустую ячейку, запрет установки второй батареи в занятую ячейку
+ * Ограничения размещения батареи: запрет установки батареи, если она уже размещена в другой ячейке
+ * Извлечение батареи: корректное извлечение батареи из ячейки, очистка ячейки после извлечения
+ * Позиция батареи: после извлечения батареи её позиция сбрасывается в null
+ * Граничные случаи: попытка извлечения батареи из пустой ячейки
+ */
+
+public class NormalCellTest { // не хватает наследования
 
     private NormalCell cell;
     private Battery battery;
@@ -41,7 +48,7 @@ public class NormalCellTest {
     }
 
     @Test
-    public void test_takeBattery_fromNormalCell(){
+    public void test_takeBattery_fromNormalCell() {
         cell.setSmallObject(battery);
 
         assertEquals(battery, cell.takeSmallObject());

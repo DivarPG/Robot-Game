@@ -1,12 +1,23 @@
 package game.model.field.core;
 
+import game.model.events.FieldActionEvent;
+import game.model.events.FieldActionListener;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import game.model.events.FieldActionEvent;
-import game.model.events.FieldActionListener;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+/* Аспекты тестирования
+ * Создание поля: корректное создание поля с заданными размерами, корректное размещение ячеек, назначение ячейки выхода в указанной позиции
+ * Связь между ячейками поля: корректное установление соседей по всем направлениям, согласованность связей между ячейками
+ * Проверка параметров создания: запрет создания поля с отрицательной шириной, запрет создания поля с нулевой шириной, запрет создания поля с отрицательной высотой, запрет создания поля с нулевой высотой, запрет создания поля с некорректной точкой выхода
+ * Работа с роботами на поле: отсутствие роботов на пустом поле, корректное получение робота при его наличии
+ * Телепортация на поле: телепортация робота при попадании в ячейку выхода, корректное сохранение состояния телепортированного робота
+ * События поля: генерация события при телепортации робота, корректное количество срабатываний события
+ * Граничные случаи: отсутствие роботов на поле, обработка некорректных параметров при создании поля
+ */
+
 
 public class FieldTest {
 
@@ -30,7 +41,7 @@ public class FieldTest {
     }
 
     @Test
-    public void test_create_withCorrectParams() {
+    public void test_create_withCorrectParams() { // соседство уже проверялось в AbstractCellTest
         AbstractCell abstractCell_0_0 = field.getCell(new Point(0, 0));
         AbstractCell abstractCell_0_1 = field.getCell(new Point(1, 0));
         AbstractCell abstractCell_1_0 = field.getCell(new Point(0, 1));
@@ -47,6 +58,7 @@ public class FieldTest {
         assertTrue(abstractCell_1_1 instanceof ExitCell);
     }
 
+    //region тестирование конструктора параметризованные тесты
     @Test
     public void test_create_withNegativeWidth() {
         assertThrows(IllegalArgumentException.class, () -> new Field(-1, 1, new Point(0, 0)));
@@ -71,6 +83,7 @@ public class FieldTest {
     public void test_create_withIncorrectExitPoint() {
         assertThrows(IllegalArgumentException.class, () -> new Field(1, 1, new Point(2, 2)));
     }
+    //endregion
 
     @Test
     public void test_getRobotsOnField_empty() {
@@ -78,7 +91,7 @@ public class FieldTest {
     }
 
     @Test
-    public void test_getRobotsOnField_oneRobot() {
+    public void test_getRobotsOnField_oneRobot() { // хороший
         Robot robot = new Robot(new Battery());
         field.getCell(new Point(0, 0)).setBigObject(robot);
 
@@ -86,7 +99,7 @@ public class FieldTest {
     }
 
     @Test
-    public void test_TeleportedRobots_oneRobot() {
+    public void test_TeleportedRobots_oneRobot() { // хороший
         Robot robot = new Robot(new Battery());
         ExitCell cell = (ExitCell) field.getCell(new Point(1, 1));
         cell.setBigObject(robot);
@@ -96,7 +109,7 @@ public class FieldTest {
     }
 
     @Test
-    public void test_teleportEvent_oneRobot() {
+    public void test_teleportEvent_oneRobot() { // хороший
         int expectedEventCount = 1;
         Robot robot = new Robot(new Battery());
 

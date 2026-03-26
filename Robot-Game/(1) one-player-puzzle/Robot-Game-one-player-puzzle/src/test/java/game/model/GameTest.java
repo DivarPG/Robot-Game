@@ -1,19 +1,19 @@
 package game.model;
 
-import game.model.field.core.Direction;
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import game.model.events.GameActionEvent;
 import game.model.events.GameActionListener;
+import game.model.field.core.Direction;
 import game.model.field.core.Robot;
 import game.model.labyrinths.TestLabyrinth;
 import game.utils.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GameTest {
     private Game game;
@@ -96,14 +96,14 @@ public class GameTest {
     public void test_robotHasNoCharge() {
         Robot robot = game.getRobot();
 
-        for(int i = 0; i < 5; i++) {
+        for (int i = 0; i < 5; i++) {
             game.getRobot().move(Direction.EAST);
             expectedEvents.add(new Pair<>(Event.ROBOT_MOVED, robot));
             game.getRobot().move(Direction.WEST);
             expectedEvents.add(new Pair<>(Event.ROBOT_MOVED, robot));
         }
 
-        assertEquals(0,  robot.getCharge());
+        assertEquals(0, robot.getCharge());
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {

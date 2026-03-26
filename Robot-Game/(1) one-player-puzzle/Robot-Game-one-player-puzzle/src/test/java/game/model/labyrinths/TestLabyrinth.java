@@ -1,14 +1,8 @@
 package game.model.labyrinths;
 
-import game.model.field.core.Direction;
-import game.model.field.core.AbstractCell;
-import game.model.field.core.BetweenCellsArea;
-import org.jetbrains.annotations.NotNull;
-import game.model.field.core.Point;
-import game.model.field.core.Field;
 import game.model.field.between_cells_objects.WallSegment;
-import game.model.field.core.Robot;
-import game.model.field.core.Battery;
+import game.model.field.core.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -31,7 +25,7 @@ public class TestLabyrinth extends Labyrinth {
 
     @Override
     protected Point exitPoint() {
-        return new Point(2,2);
+        return new Point(2, 2);
     }
 
     @Override
