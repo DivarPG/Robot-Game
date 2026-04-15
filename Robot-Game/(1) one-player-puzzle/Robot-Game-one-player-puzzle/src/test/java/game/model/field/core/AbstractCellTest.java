@@ -20,280 +20,56 @@ import static org.junit.jupiter.api.Assertions.*;
  * Граничные случаи: отсутствие соседа, отсутствие препятствия, корректная обработка некорректных операций
  */
 
-class AbstractCellTest {
-
-    private AbstractCell cell;
-
-    public AbstractCellTest() { // зачем конструктор
-    }
-
-
-    @BeforeEach
-    public void testSetup() {
-
-        cell = new NormalCell();
-    }
-
-    //region Хорошие тесты
-    @Test
-    public void test_setRobot_InEmptyCell() {
-        Robot robot = new Robot(new Battery());
-
-        cell.setBigObject(robot);
-
-        assertEquals(robot, cell.getBigObject());
-        assertEquals(cell, robot.getPosition());
-    }
+abstract class AbstractCellTest {
 
     @Test
-    public void test_takeRobot_FromCellWithRobot() {
-        Robot robot = new Robot(new Battery());
-
-        cell.setBigObject(robot);
-
-        assertEquals(robot, cell.takeBigObject());
-        assertNull(robot.getPosition());
-        assertNull(cell.getBigObject());
-    }
+    abstract void setRobot_InEmptyCell();
 
     @Test
-    public void test_setRobot_ToCellWithRobot() {
-        Robot robot = new Robot(new Battery());
-        Robot newRobot = new Robot(new Battery());
-
-        cell.setBigObject(robot);
-
-        assertFalse(cell.setBigObject(newRobot));
-        assertEquals(robot, cell.getBigObject());
-        assertEquals(cell, robot.getPosition());
-        assertNull(newRobot.getPosition());
-    }
+    abstract void takeRobot_FromCellWithRobot();
 
     @Test
-    public void test_setRobot_ToCellAgain() {
-        Robot robot = new Robot(new Battery());
-
-        cell.setBigObject(robot);
-
-        assertFalse(cell.setBigObject(robot));
-        assertEquals(robot, cell.getBigObject());
-        assertEquals(cell, robot.getPosition());
-    }
-    //endregion
+    abstract void setRobot_ToCellWithRobot();
 
     @Test
-    public void test_setNeighborCell() {   // Проверка пакетного метода, а не публичного контракта, несколько блоков arrange Возможно стоит перенести в филд
-        // Можно создать фабричный метод для создания ячейки по направлению, чтобы упростить блок arrange
-        AbstractCell neighborCell = new NormalCell();
-        Direction direction = Direction.NORTH;
-
-        Map<Direction, AbstractCell> map = new HashMap<>(); // соседи в направлениях
-        map.put(direction, neighborCell);
-
-        neighborCell.setNeighbors(null); // по умолчанию и так нулл блок act должен быть атомарным
-        cell.setNeighbors(map);
-
-        assertEquals(neighborCell, cell.getNeighborCell(direction));
-        assertEquals(cell, neighborCell.getNeighborCell(direction.getOppositeDirection()));
-    }
-
+    abstract void setRobot_ToCellAgain();
 
     @Test
-    public void test_setNeighborCell_doubleSided() { // Проверка пакетного метода, несколько блоков arrange
-        AbstractCell neighborCell = new NormalCell();
-        Direction direction = Direction.NORTH;
-
-        Map<Direction, AbstractCell> map = new HashMap<>();
-        neighborCell.setNeighbors(null); // !!!
-        map.put(direction, neighborCell);
-
-        Map<Direction, AbstractCell> map2 = new HashMap<>();
-        cell.setNeighbors(map);
-        map2.put(direction.getOppositeDirection(), cell);
-
-        assertTrue(neighborCell.setNeighbors(map2));
-        assertEquals(neighborCell, cell.getNeighborCell(direction));
-        assertEquals(cell, neighborCell.getNeighborCell(direction.getOppositeDirection()));
-    }
+    abstract void setNeighborCell();
 
     @Test
-    public void test_setNeighborCell_twoTimesInOneDirection() { // неправильная структура теста
-        // arrange
-        AbstractCell neighborCell = new NormalCell();
-        AbstractCell anotherCell = new NormalCell();
-        Direction direction = Direction.NORTH;
-
-        // arrange
-        Map<Direction, AbstractCell> map = new HashMap<>();
-        neighborCell.setNeighbors(null); // !!!
-        // act
-        map.put(direction, neighborCell);
-
-        // act
-        cell.setNeighbors(map);
-
-        // arrange
-        Map<Direction, AbstractCell> map2 = new HashMap<>();
-        anotherCell.setNeighbors(null); // !!!
-        // act
-        map2.put(direction, anotherCell);
-
-        // assert
-        assertFalse(cell.setNeighbors(map2));
-        assertEquals(neighborCell, cell.getNeighborCell(direction));
-        assertEquals(cell, neighborCell.getNeighborCell(direction.getOppositeDirection()));
-    }
+    abstract void setNeighborCell_doubleSided();
 
     @Test
-    public void test_setNeighborCell_alreadyNeighborWithAnotherDirection() { // !!!
-        AbstractCell neighborCell = new NormalCell();
-        Direction direction = Direction.NORTH;
-        Direction anotherDirection = Direction.SOUTH;
-
-        Map<Direction, AbstractCell> map = new HashMap<>();
-        map.put(direction, neighborCell);
-
-        neighborCell.setNeighbors(null);
-        cell.setNeighbors(map);
-
-        Map<Direction, AbstractCell> map2 = new HashMap<>();
-        map2.put(anotherDirection, neighborCell);
-
-        assertFalse(cell.setNeighbors(map2));
-        assertEquals(neighborCell, cell.getNeighborCell(direction));
-        assertEquals(cell, neighborCell.getNeighborCell(direction.getOppositeDirection()));
-    }
+    abstract void setNeighborCell_twoTimesInOneDirection();
 
     @Test
-    public void test_setNeighborCell_setSelfAsNeighbor() { // фабричный метод
-        Direction direction = Direction.NORTH;
-
-        Map<Direction, AbstractCell> map = new HashMap<>();
-        map.put(direction, cell);
-
-        assertFalse(cell.setNeighbors(map));
-        assertNull(cell.getNeighborCell(direction));
-    }
+    abstract void setNeighborCell_alreadyNeighborWithAnotherDirection();
 
     @Test
-    public void test_isNeighbor_WhenNeighborCellExists() { // !!!
-        AbstractCell neighborCell = new NormalCell();
-        Direction direction = Direction.NORTH;
-
-        Map<Direction, AbstractCell> map = new HashMap<>();
-        map.put(direction, neighborCell);
-
-        neighborCell.setNeighbors(null);
-        cell.setNeighbors(map);
-
-        assertEquals(neighborCell, cell.getNeighborCell(direction));
-    }
+    abstract void setNeighborCell_setSelfAsNeighbor();
 
     @Test
-    public void test_isNeighbor_WhenNeighborCellNotExists() {
-        assertNull(cell.getNeighborCell(Direction.NORTH));
-    }
+    abstract void isNeighbor_WhenNeighborCellExists();
 
     @Test
-    public void test_setWall_inOneSingleCell() { // хороший
-        Direction direction = Direction.NORTH;
-        WallSegment wallSegment = new WallSegment();
-
-        cell.setNeighbors(null); // !!!
-        cell.setNeighborObstacle(direction, wallSegment);
-        assertEquals(wallSegment, cell.getNeighborObstacle(direction));
-        assertEquals(cell, wallSegment.getPosition().getNeighborCell(direction.getOppositeDirection()));
-    }
+    abstract void isNeighbor_WhenNeighborCellNotExists();
 
     @Test
-    public void test_setWall_InSingleWithSameWallAndAnotherDirection() { // хороший
-        Direction direction = Direction.NORTH;
-        WallSegment wallSegment = new WallSegment();
-
-        cell.setNeighbors(null); // !!!
-        cell.setNeighborObstacle(direction, wallSegment);
-        assertFalse(cell.setNeighborObstacle(Direction.SOUTH, wallSegment));
-        assertEquals(wallSegment, cell.getNeighborObstacle(direction));
-        assertEquals(cell, wallSegment.getPosition().getNeighborCell(direction.getOppositeDirection()));
-    }
+    abstract void setWall_InSingleWithSameWallAndAnotherDirection();
 
     @Test
-    public void test_setWall_InSingleWithSameDirectionAndAnotherWallSegment() { // хороший
-        Direction direction = Direction.NORTH;
-        WallSegment wallSegment = new WallSegment();
-        WallSegment anotherWallSegment = new WallSegment();
-
-        cell.setNeighbors(null); // !!!
-        cell.setNeighborObstacle(direction, wallSegment);
-        assertFalse(cell.setNeighborObstacle(direction, anotherWallSegment));
-        assertEquals(wallSegment, cell.getNeighborObstacle(direction));
-        assertEquals(cell, wallSegment.getPosition().getNeighborCell(direction.getOppositeDirection()));
-    }
+    abstract void setWall_InSingleWithSameDirectionAndAnotherWallSegment();
 
     @Test
-    public void test_setWall_inNeighborCells() { // фабричный метод для соседей
-        Direction direction = Direction.NORTH;
-        AbstractCell neighborCell = new NormalCell();
-        Map<Direction, AbstractCell> neighborCells = new HashMap<>();
-        neighborCells.put(direction, neighborCell);
-
-        neighborCell.setNeighbors(null); // !!!
-        cell.setNeighbors(neighborCells);
-        WallSegment wallSegment = new WallSegment();
-        cell.setNeighborObstacle(direction, wallSegment);
-
-        assertEquals(wallSegment, cell.getNeighborObstacle(direction));
-        assertEquals(wallSegment, neighborCell.getNeighborObstacle(direction.getOppositeDirection()));
-        assertEquals(cell, wallSegment.getPosition().getNeighborCell(direction.getOppositeDirection()));
-        assertEquals(neighborCell, wallSegment.getPosition().getNeighborCell(direction));
-    }
+    abstract void setWall_inNeighborCells();
 
     @Test
-    public void test_setWall_InNeighborCellsWithSameDirectionAndAnotherWallSegment() { // фабричный метод для соседей
-        Direction direction = Direction.NORTH;
-        AbstractCell neighborCell = new NormalCell();
-        Map<Direction, AbstractCell> neighborCells = new HashMap<>();
-        neighborCells.put(direction, neighborCell);
-
-        neighborCell.setNeighbors(null);
-        cell.setNeighbors(neighborCells);
-        WallSegment wallSegment = new WallSegment();
-        WallSegment anotherWallSegment = new WallSegment();
-
-        cell.setNeighborObstacle(direction, wallSegment);
-
-        assertFalse(cell.setNeighborObstacle(direction, anotherWallSegment));
-        assertEquals(wallSegment, cell.getNeighborObstacle(direction));
-        assertEquals(wallSegment, neighborCell.getNeighborObstacle(direction.getOppositeDirection()));
-        assertEquals(cell, wallSegment.getPosition().getNeighborCell(direction.getOppositeDirection()));
-        assertEquals(neighborCell, wallSegment.getPosition().getNeighborCell(direction));
-    }
+    abstract void setWall_InNeighborCellsWithSameDirectionAndAnotherWallSegment();
 
     @Test
-    public void test_setWall_InNeighborCellsWithSameWallSegmentAndAnotherDirection() { // фабричный метод для соседей
-        Direction direction = Direction.NORTH;
-        AbstractCell neighborCell = new NormalCell();
-        Map<Direction, AbstractCell> neighborCells = new HashMap<>();
-        neighborCells.put(direction, neighborCell);
-
-        neighborCell.setNeighbors(null);
-        cell.setNeighbors(neighborCells);
-        WallSegment wallSegment = new WallSegment();
-        Direction anotherDirection = direction.getOppositeDirection();
-
-        cell.setNeighborObstacle(direction, wallSegment);
-
-        assertFalse(cell.setNeighborObstacle(anotherDirection, wallSegment));
-        assertEquals(wallSegment, cell.getNeighborObstacle(direction));
-        assertEquals(wallSegment, neighborCell.getNeighborObstacle(direction.getOppositeDirection()));
-        assertEquals(cell, wallSegment.getPosition().getNeighborCell(direction.getOppositeDirection()));
-        assertEquals(neighborCell, wallSegment.getPosition().getNeighborCell(direction));
-    }
+    abstract void setWall_InNeighborCellsWithSameWallSegmentAndAnotherDirection();
 
     @Test
-    public void test_neighborWall_wallNotExists() {
-        Direction direction = Direction.NORTH;
-
-        assertNull(cell.getNeighborArea(direction));
-    }
+    abstract void neighborWall_wallNotExists();
 }
