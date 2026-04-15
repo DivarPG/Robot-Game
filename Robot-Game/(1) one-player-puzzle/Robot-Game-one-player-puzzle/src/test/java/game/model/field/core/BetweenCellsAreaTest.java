@@ -15,55 +15,74 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BetweenCellsAreaTest {
 
-    private AbstractCell abstractCell;
-    private AbstractCell neighborAbstractCell;
+    private AbstractCell leftCell;
+    private AbstractCell rightCell;
+    private AbstractCell topCell;
+    private AbstractCell bottomCell;
 
     @BeforeEach
     public void testSetup() {
-        abstractCell = new NormalCell();
-        abstractCell.setNeighbors(null);
-
-        neighborAbstractCell = new NormalCell();
+        leftCell = new NormalCell();
+        rightCell = new NormalCell();
+        topCell = new NormalCell();
+        bottomCell = new NormalCell();
     }
 
-    // отсутствует предварительная установка соседей что делает проверки бессмысленными
     @Test
-    public void test_setHorizontalNeighbors() { // отдельно выделить act
-        BetweenCellsArea betweenCellsArea = abstractCell.getNeighborArea(Direction.EAST);
+    public void test_setHorizontalNeighbors() {
+        BetweenCellsArea betweenCellsArea = new BetweenCellsArea();
 
-        assertTrue(betweenCellsArea.setHorizontalNeighbors(abstractCell, neighborAbstractCell));
+        boolean result = betweenCellsArea.setHorizontalNeighbors(leftCell, rightCell);
+
+        assertTrue(result);
         assertEquals(Orientation.VERTICAL, betweenCellsArea.getOrientation());
-        assertEquals(abstractCell, betweenCellsArea.getNeighborCell(Direction.WEST));
-        assertEquals(neighborAbstractCell, betweenCellsArea.getNeighborCell(Direction.EAST));
+        assertEquals(leftCell, betweenCellsArea.getNeighborCell(Direction.WEST));
+        assertEquals(rightCell, betweenCellsArea.getNeighborCell(Direction.EAST));
+        assertSame(betweenCellsArea, leftCell.getNeighborArea(Direction.EAST));
+        assertSame(betweenCellsArea, rightCell.getNeighborArea(Direction.WEST));
     }
 
     @Test
-    public void test_setVerticalNeighbors() { // отдельно выделить act
-        BetweenCellsArea betweenCellsArea = abstractCell.getNeighborArea(Direction.SOUTH);
+    public void test_setVerticalNeighbors() {
+        BetweenCellsArea betweenCellsArea = new BetweenCellsArea();
 
-        assertTrue(betweenCellsArea.setVerticalNeighbors(abstractCell, neighborAbstractCell));
+        boolean result = betweenCellsArea.setVerticalNeighbors(topCell, bottomCell);
+
+        assertTrue(result);
         assertEquals(Orientation.HORIZONTAL, betweenCellsArea.getOrientation());
-        assertEquals(abstractCell, betweenCellsArea.getNeighborCell(Direction.NORTH));
-        assertEquals(neighborAbstractCell, betweenCellsArea.getNeighborCell(Direction.SOUTH));
+        assertEquals(topCell, betweenCellsArea.getNeighborCell(Direction.NORTH));
+        assertEquals(bottomCell, betweenCellsArea.getNeighborCell(Direction.SOUTH));
+        assertSame(betweenCellsArea, topCell.getNeighborArea(Direction.SOUTH));
+        assertSame(betweenCellsArea, bottomCell.getNeighborArea(Direction.NORTH));
     }
 
     @Test
-    public void test_setHorizontalNeighbors_alreadyHasVerticalNeighbors() {  // отдельно выделить act
-        BetweenCellsArea betweenCellsArea = abstractCell.getNeighborArea(Direction.EAST);
+    public void test_setHorizontalNeighbors_alreadyHasVerticalNeighbors() {
+        BetweenCellsArea betweenCellsArea = new BetweenCellsArea();
+        betweenCellsArea.setVerticalNeighbors(topCell, bottomCell);
 
-        assertFalse(betweenCellsArea.setVerticalNeighbors(abstractCell, neighborAbstractCell));
-        assertEquals(Orientation.VERTICAL, betweenCellsArea.getOrientation());
-        assertEquals(abstractCell, betweenCellsArea.getNeighborCell(Direction.WEST));
+        boolean result = betweenCellsArea.setHorizontalNeighbors(leftCell, rightCell);
+
+        assertFalse(result);
+        assertEquals(Orientation.HORIZONTAL, betweenCellsArea.getOrientation());
+        assertEquals(topCell, betweenCellsArea.getNeighborCell(Direction.NORTH));
+        assertEquals(bottomCell, betweenCellsArea.getNeighborCell(Direction.SOUTH));
+        assertNull(betweenCellsArea.getNeighborCell(Direction.WEST));
         assertNull(betweenCellsArea.getNeighborCell(Direction.EAST));
     }
 
     @Test
-    public void test_setVerticalNeighbors_alreadyHasHorizontalNeighbors() { // отдельно выделить act
-        BetweenCellsArea betweenCellsArea = abstractCell.getNeighborArea(Direction.SOUTH);
+    public void test_setVerticalNeighbors_alreadyHasHorizontalNeighbors() {
+        BetweenCellsArea betweenCellsArea = new BetweenCellsArea();
+        betweenCellsArea.setHorizontalNeighbors(leftCell, rightCell);
 
-        assertFalse(betweenCellsArea.setHorizontalNeighbors(abstractCell, neighborAbstractCell));
-        assertEquals(Orientation.HORIZONTAL, betweenCellsArea.getOrientation());
-        assertEquals(abstractCell, betweenCellsArea.getNeighborCell(Direction.NORTH));
+        boolean result = betweenCellsArea.setVerticalNeighbors(topCell, bottomCell);
+
+        assertFalse(result);
+        assertEquals(Orientation.VERTICAL, betweenCellsArea.getOrientation());
+        assertEquals(leftCell, betweenCellsArea.getNeighborCell(Direction.WEST));
+        assertEquals(rightCell, betweenCellsArea.getNeighborCell(Direction.EAST));
+        assertNull(betweenCellsArea.getNeighborCell(Direction.NORTH));
         assertNull(betweenCellsArea.getNeighborCell(Direction.SOUTH));
     }
 }
