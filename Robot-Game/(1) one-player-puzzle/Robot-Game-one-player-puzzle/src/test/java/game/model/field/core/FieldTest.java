@@ -21,44 +21,50 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class FieldTest {
 
-    private int eventCount = 0;
+    private static final Point EXIT_POINT = new Point(1, 1);
+
+    private int eventCount;
+    private FieldActionEvent lastEvent;
+    private Field field;
 
     class FieldObserver implements FieldActionListener {
 
         @Override
         public void robotIsTeleported(@NotNull FieldActionEvent event) {
             eventCount += 1;
+            lastEvent = event;
         }
     }
-
-    private Field field;
 
     @BeforeEach
     public void testSetup() {
         eventCount = 0;
-        field = new Field(2, 2, new Point(1, 1));
+        lastEvent = null;
+        field = new Field(2, 2, EXIT_POINT);
         field.addFieldActionListener(new FieldObserver());
     }
 
     @Test
-    public void test_create_withCorrectParams() { // соседство уже проверялось в AbstractCellTest
-        AbstractCell abstractCell_0_0 = field.getCell(new Point(0, 0));
-        AbstractCell abstractCell_0_1 = field.getCell(new Point(1, 0));
-        AbstractCell abstractCell_1_0 = field.getCell(new Point(0, 1));
-        AbstractCell abstractCell_1_1 = field.getCell(new Point(1, 1));
+    public void test_create_withCorrectParams() {
+        AbstractCell cell00 = field.getCell(new Point(0, 0));
+        AbstractCell cell10 = field.getCell(new Point(1, 0));
+        AbstractCell cell01 = field.getCell(new Point(0, 1));
+        AbstractCell cell11 = field.getCell(EXIT_POINT);
 
-        assertEquals(abstractCell_1_0, abstractCell_0_0.getNeighborCell(Direction.SOUTH));
-        assertEquals(abstractCell_1_1, abstractCell_0_1.getNeighborCell(Direction.SOUTH));
-        assertEquals(abstractCell_0_1, abstractCell_1_1.getNeighborCell(Direction.NORTH));
-        assertEquals(abstractCell_0_0, abstractCell_1_0.getNeighborCell(Direction.NORTH));
-        assertEquals(abstractCell_0_1, abstractCell_0_0.getNeighborCell(Direction.EAST));
-        assertEquals(abstractCell_1_1, abstractCell_1_0.getNeighborCell(Direction.EAST));
-        assertEquals(abstractCell_0_0, abstractCell_0_1.getNeighborCell(Direction.WEST));
-        assertEquals(abstractCell_1_0, abstractCell_1_1.getNeighborCell(Direction.WEST));
-        assertTrue(abstractCell_1_1 instanceof ExitCell);
+        assertEquals(2, field.getWidth());
+        assertEquals(2, field.getHeight());
+        assertSame(cell01, cell00.getNeighborCell(Direction.SOUTH));
+        assertSame(cell11, cell10.getNeighborCell(Direction.SOUTH));
+        assertSame(cell10, cell11.getNeighborCell(Direction.NORTH));
+        assertSame(cell00, cell01.getNeighborCell(Direction.NORTH));
+        assertSame(cell10, cell00.getNeighborCell(Direction.EAST));
+        assertSame(cell11, cell01.getNeighborCell(Direction.EAST));
+        assertSame(cell00, cell10.getNeighborCell(Direction.WEST));
+        assertSame(cell01, cell11.getNeighborCell(Direction.WEST));
+        assertTrue(cell11 instanceof ExitCell);
+        assertTrue(cell00 instanceof NormalCell);
     }
 
-    //region тестирование конструктора параметризованные тесты
     @Test
     public void test_create_withNegativeWidth() {
         assertThrows(IllegalArgumentException.class, () -> new Field(-1, 1, new Point(0, 0)));
@@ -80,10 +86,14 @@ public class FieldTest {
     }
 
     @Test
-    public void test_create_withIncorrectExitPoint() {
-        assertThrows(IllegalArgumentException.class, () -> new Field(1, 1, new Point(2, 2)));
+    public void test_create_withIncorrectExitPoint_xOutOfBounds() {
+        assertThrows(IllegalArgumentException.class, () -> new Field(1, 1, new Point(2, 0)));
     }
-    //endregion
+
+    @Test
+    public void test_create_withIncorrectExitPoint_yOutOfBounds() {
+        assertThrows(IllegalArgumentException.class, () -> new Field(1, 1, new Point(0, 2)));
+    }
 
     @Test
     public void test_getRobotsOnField_empty() {
@@ -91,30 +101,48 @@ public class FieldTest {
     }
 
     @Test
-    public void test_getRobotsOnField_oneRobot() { // хороший
+    public void test_getRobotsOnField_oneRobot() {
         Robot robot = new Robot(new Battery());
         field.getCell(new Point(0, 0)).setBigObject(robot);
 
-        assertEquals(robot, field.getRobot());
+        assertSame(robot, field.getRobot());
     }
 
     @Test
-    public void test_TeleportedRobots_oneRobot() { // хороший
+    public void test_TeleportedRobots_oneRobot() {
         Robot robot = new Robot(new Battery());
-        ExitCell cell = (ExitCell) field.getCell(new Point(1, 1));
-        cell.setBigObject(robot);
+        ExitCell exitCell = (ExitCell) field.getCell(EXIT_POINT);
 
-        assertEquals(robot, cell.getTeleportedRobot());
+        boolean result = exitCell.setBigObject(robot);
+
+        assertTrue(result);
+        assertSame(robot, exitCell.getTeleportedRobot());
         assertTrue(robot.isTeleported());
     }
 
     @Test
-    public void test_teleportEvent_oneRobot() { // хороший
-        int expectedEventCount = 1;
+    public void test_teleportEvent_oneRobot() {
+        Robot robot = new Robot(new Battery());
+        AbstractCell exitCell = field.getCell(EXIT_POINT);
+
+        boolean result = exitCell.setBigObject(robot);
+
+        assertTrue(result);
+        assertEquals(1, eventCount);
+        assertNotNull(lastEvent);
+        assertSame(field, lastEvent.getSource());
+        assertSame(robot, lastEvent.getRobot());
+        assertSame(exitCell, lastEvent.getTeleport());
+    }
+
+    @Test
+    public void test_teleportEvent_notTriggeredWhenRobotNotPlacedInExitCell() {
         Robot robot = new Robot(new Battery());
 
-        field.getCell(new Point(1, 1)).setBigObject(robot);
+        boolean result = field.getCell(new Point(0, 0)).setBigObject(robot);
 
-        assertEquals(expectedEventCount, eventCount);
+        assertTrue(result);
+        assertEquals(0, eventCount);
+        assertNull(lastEvent);
     }
 }
