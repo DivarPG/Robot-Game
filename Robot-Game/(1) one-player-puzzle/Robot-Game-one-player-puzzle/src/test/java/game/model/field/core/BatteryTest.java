@@ -16,22 +16,17 @@ import static org.junit.jupiter.api.Assertions.*;
  * Граничные случаи: попытка списания заряда больше доступного, попытка размещения батареи в некорректных условиях
  */
 
-/*
-совсем никак не покрываются disconnect(), destroy()
-Нет тестов на исключения: при вызове getCharge() или drainCharge() на уничтоженной батарее должно выбрасываться RuntimeException.
-Нет тестов на корректность работы с позицией (методы setPosition и unsetPosition унаследованы от CellObject, но не проверяются).
-*/
-
 class BatteryTest {
 
     private static final int DEFAULT_TEST_BATTERY_CHARGE = 10;
 
     private Battery battery;
+    private Robot robot;
 
     @BeforeEach
     public void testSetup() {
         battery = new Battery();
-        Robot robot = new Robot(battery);
+        robot = new Robot(battery);
     }
 
     @Test
@@ -42,71 +37,149 @@ class BatteryTest {
     @Test
     public void test_releaseCharge_whenChargeAmountLessCharge() {
         int chargeAmount = 5;
-        assertTrue(battery.drainCharge(chargeAmount));
+
+        boolean result = battery.drainCharge(chargeAmount);
+
+        assertTrue(result);
         assertEquals(DEFAULT_TEST_BATTERY_CHARGE - chargeAmount, battery.getCharge());
     }
 
     @Test
-    public void test_releaseCharge_whenChargeEqualsCharge() { // хороший, но drainCharge хочется в result как в test_canLocateAtPosition_isConnected
+    public void test_releaseCharge_whenChargeEqualsCharge() {
         int chargeAmount = DEFAULT_TEST_BATTERY_CHARGE;
-        assertTrue(battery.drainCharge(chargeAmount));
+
+        boolean result = battery.drainCharge(chargeAmount);
+
+        assertTrue(result);
         assertEquals(0, battery.getCharge());
     }
 
     @Test
-    public void test_canLocateAtPosition_isConnected() { // хороший
-        NormalCell cellWithPowerSupply = new NormalCell();
+    public void test_releaseCharge_whenChargeAmountMoreThanCharge() {
+        int chargeAmount = DEFAULT_TEST_BATTERY_CHARGE + 1;
 
-        boolean result = battery.canSetPosition(cellWithPowerSupply);
+        boolean result = battery.drainCharge(chargeAmount);
+
+        assertFalse(result);
+        assertEquals(DEFAULT_TEST_BATTERY_CHARGE, battery.getCharge());
+    }
+
+    @Test
+    public void test_releaseCharge_whenDisconnected_throwsRuntimeException() {
+        battery.disconnect();
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> battery.drainCharge(1));
+
+        assertEquals("Not connected to user", exception.getMessage());
+    }
+
+    @Test
+    public void test_canLocateAtPosition_isConnected() {
+        NormalCell normalCell = new NormalCell();
+
+        boolean result = battery.canSetPosition(normalCell);
 
         assertFalse(result);
     }
 
     @Test
-    public void test_canLocateAtPosition_disconnected() { // хороший
-        NormalCell cellWithPowerSupply = new NormalCell();
-        Battery battery = new Battery();
+    public void test_canLocateAtPosition_disconnected() {
+        NormalCell normalCell = new NormalCell();
+        battery.disconnect();
 
-        boolean result = battery.canSetPosition(cellWithPowerSupply);
+        boolean result = battery.canSetPosition(normalCell);
 
         assertTrue(result);
     }
 
-
     @Test
-    public void test_canLocateAtPosition_inCellWithBattery() { // хороший
+    public void test_canLocateAtPosition_inCellWithBattery() {
         Battery anotherBattery = new Battery();
-        NormalCell cellWithPowerSupply = new NormalCell();
-        cellWithPowerSupply.setSmallObject(anotherBattery);
+        NormalCell normalCell = new NormalCell();
+        normalCell.setSmallObject(anotherBattery);
+        battery.disconnect();
 
-        boolean result = battery.canSetPosition(cellWithPowerSupply);
+        boolean result = battery.canSetPosition(normalCell);
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void test_canLocateAtPosition_alreadyHavePosition() {
+        NormalCell normalCell = new NormalCell();
+        battery.disconnect();
+        normalCell.setSmallObject(battery);
+
+        boolean result = battery.canSetPosition(normalCell);
 
         assertFalse(result);
     }
 
     @Test
-    public void test_canLocateAtPosition_alreadyHavePosition() { // хороший
-        NormalCell cellWithPowerSupply = new NormalCell();
-        cellWithPowerSupply.setSmallObject(battery);
-
-        boolean result = battery.canSetPosition(cellWithPowerSupply);
-
-        assertFalse(result);
-    }
-
-    @Test
-    public void test_canLocateAtPosition_inNotCellWithPowerSupply() { // хороший
+    public void test_canLocateAtPosition_inNormalCell() {
         AbstractCell cell = new NormalCell();
+        battery.disconnect();
 
         boolean result = battery.canSetPosition(cell);
 
-        assertFalse(result);
+        assertTrue(result);
     }
 
     @Test
-    public void test_releaseCharge_whenChargeAmountMoreThanCharge() {  // хороший
-        int chargeAmount = 11;
-        assertFalse(battery.drainCharge(chargeAmount));
-        assertEquals(DEFAULT_TEST_BATTERY_CHARGE, battery.getCharge());
+    public void test_disconnect_connectedBattery_disconnectsFromRobot() {
+        boolean result = battery.disconnect();
+
+        assertTrue(result);
+        assertFalse(battery.isConnected());
+        assertTrue(robot.unsetBattery());
+    }
+
+    @Test
+    public void test_setPosition_disconnectedBattery_setsPosition() {
+        NormalCell normalCell = new NormalCell();
+        battery.disconnect();
+
+        boolean result = battery.setPosition(normalCell);
+
+        assertTrue(result);
+        assertEquals(normalCell, battery.getPosition());
+    }
+
+    @Test
+    public void test_unsetPosition_batteryInCell_clearsPosition() {
+        NormalCell normalCell = new NormalCell();
+        battery.disconnect();
+        normalCell.setSmallObject(battery);
+
+        battery.unsetPosition();
+
+        assertNull(battery.getPosition());
+    }
+
+    @Test
+    public void test_destroy_batteryBecomesDestroyedAndDisconnected() {
+        battery.destroy();
+
+        assertTrue(battery.isDestroy());
+        assertThrows(RuntimeException.class, battery::isConnected);
+        assertTrue(robot.unsetBattery());
+    }
+
+    @Test
+    public void test_getCharge_destroyedBattery_throwsRuntimeException() {
+        battery.destroy();
+
+        RuntimeException exception = assertThrows(RuntimeException.class, battery::getCharge);
+
+        assertEquals("Battery is destroyed", exception.getMessage());
+    }
+
+    @Test
+    public void test_drainCharge_destroyedBattery_throwsRuntimeException() {
+        battery.destroy();
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> battery.drainCharge(1));
+
+        assertEquals("Battery is destroyed", exception.getMessage());
     }
 }
