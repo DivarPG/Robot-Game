@@ -1,13 +1,9 @@
 package game.ui;
 
-import game.model.field.core.ExitCell;
-import game.model.field.core.NormalCell;
 import game.model.field.core.*;
 import game.model.field.core.Robot;
 import game.ui.obstacle.BetweenCellsWidget;
-import game.ui.obstacle.WallWidget;
 import org.jetbrains.annotations.NotNull;
-import game.ui.obstacle.ObstacleWidget;
 import game.ui.cell.*;
 
 import java.awt.*;
@@ -16,41 +12,44 @@ import java.util.Map;
 
 public class WidgetFactory {
 
-    private final Map<AbstractCell, CellWidget> cells = new HashMap<>();
+    private final Map<Cell, CellWidget> cells = new HashMap<>();
     private final Map<CellObject, CellItemWidget> cellObjects = new HashMap<>();
     private final Map<BetweenCellsArea, BetweenCellsWidget> betweenCellsAreas = new HashMap<>();
 
     /*---------- AbstractCell ----------*/
-    public CellWidget create(@NotNull AbstractCell cell) {
+    public CellWidget create(@NotNull Cell cell) {
         if (cells.containsKey(cell)) return cells.get(cell);
 
-        CellWidget item = (cell instanceof ExitCell) ? new ExitWidget() : new CellWidget();
+        CellWidget item = new CellWidget();
 
-        Robot robot = cell.getBigObject();
+        Robot robot = (Robot) cell.getObject(Robot.class);
         if (robot != null) {
             CellItemWidget robotWidget = create(robot);
             item.addItem(robotWidget);
         }
 
-        if (cell instanceof NormalCell) {
-            Battery battery = ((NormalCell) cell).getSmallObject();
+        Battery battery = (Battery) cell.getObject(Battery.class);
 
-            if (battery != null) {
-                CellItemWidget batteryWidget = create(battery);
-                item.addItem(batteryWidget);
-            }
+        if (battery != null) {
+            CellItemWidget batteryWidget = create(battery);
+            item.addItem(batteryWidget);
         }
 
+        ExitPoint exitPoint = (ExitPoint) cell.getObject(ExitPoint.class);
+        if (exitPoint != null) {
+            CellItemWidget exitWidget = create(exitPoint);
+            item.addItem(exitWidget);
+        }
 
         cells.put(cell, item);
         return item;
     }
 
-    public CellWidget getWidget(@NotNull AbstractCell cell) {
+    public CellWidget getWidget(@NotNull Cell cell) {
         return cells.get(cell);
     }
 
-    public void remove(@NotNull AbstractCell cell) {
+    public void remove(@NotNull Cell cell) {
         cells.remove(cell);
     }
 
@@ -63,6 +62,8 @@ public class WidgetFactory {
             createdWidget = new RobotWidget((Robot) cellObject, Color.BLUE);
         } else if (cellObject instanceof Battery) {
             createdWidget = new BatteryWidget((Battery) cellObject);
+        } else if (cellObject instanceof ExitPoint) {
+            createdWidget = new ExitWidget();
         } else {
             throw new IllegalArgumentException();
         }

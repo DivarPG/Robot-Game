@@ -1,6 +1,6 @@
 package game.ui.cell;
 
-import game.model.field.core.ExitCell;
+import game.model.field.core.ExitPoint;
 import game.ui.utils.ImageUtils;
 
 import javax.imageio.ImageIO;
@@ -12,19 +12,29 @@ import java.io.IOException;
 /**
  * Виджет ячейки выхода.
  *
- * @see ExitCell
+ * @see ExitPoint
  */
-public class ExitWidget extends CellWidget {
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+public class ExitWidget extends CellItemWidget {
 
+    @Override
+    protected BufferedImage getImage() {
+        BufferedImage image = null;
         try {
-            BufferedImage image = ImageIO.read(new File(ImageUtils.IMAGE_PATH + "exit.png"));
-            image = ImageUtils.resizeImage(image, 120, 120);
-            g.drawImage(image, 0, 0, null);
+            image = ImageIO.read(new File(ImageUtils.IMAGE_PATH + "exit.png"));
+            image = ImageUtils.resizeImage(image, 120, 100);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return image;
+    }
+
+    @Override
+    public CellWidget.Layer getLayer() {
+        return CellWidget.Layer.TOP;
+    }
+
+    @Override
+    protected Dimension getDimension() {
+        return new Dimension(120, 120);
     }
 }

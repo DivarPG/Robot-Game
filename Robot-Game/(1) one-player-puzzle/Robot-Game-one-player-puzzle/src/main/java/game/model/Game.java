@@ -16,7 +16,6 @@ public class Game {
 
     //region КОНСТРУКТОРЫ
 
-    //TODO несоответствие диаграмме(оставила бы как в коде)
     public Game(Labyrinth labyrinth) {
         start(labyrinth);
     }

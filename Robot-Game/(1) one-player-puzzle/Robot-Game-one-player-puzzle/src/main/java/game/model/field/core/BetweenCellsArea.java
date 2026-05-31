@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 /**
- * Класс позиции между ячейками {@link AbstractCell}
+ * Класс позиции между ячейками {@link Cell}
  */
 public class BetweenCellsArea {
 
@@ -61,7 +61,7 @@ public class BetweenCellsArea {
     /**
      * Соседние ячейки.
      */
-    private final Map<Direction, AbstractCell> neighborCells = new EnumMap<>(Direction.class);
+    private final Map<Direction, Cell> neighborCells = new EnumMap<>(Direction.class);
 
     /**
      * Получить соседнюю ячейку в заданном направлении.
@@ -69,7 +69,7 @@ public class BetweenCellsArea {
      * @param direction направление.
      * @return соседняя ячейка в заданном направлении.
      */
-    public AbstractCell getNeighborCell(@NotNull Direction direction) {
+    public Cell getNeighborCell(@NotNull Direction direction) {
         return neighborCells.get(direction);
     }
 
@@ -80,27 +80,25 @@ public class BetweenCellsArea {
      * @param rightCell ячейка справа.
      * @return успешность.
      */
-    boolean setHorizontalNeighbors(AbstractCell leftCell, AbstractCell rightCell) {
+    boolean setHorizontalNeighbors(Cell leftCell, Cell rightCell) {
         if (!canSetHorizontalNeighbors(leftCell, rightCell)) return false;
 
         orientation = Orientation.VERTICAL;
 
         boolean success = true;
 
-        if (leftCell != null){
+        if (leftCell != null) {
             if (leftCell.setNeighborArea(Direction.EAST, this)) {
                 this.neighborCells.put(Direction.WEST, leftCell);
-            }
-            else {
+            } else {
                 success = false;
             }
         }
 
-        if (rightCell != null){
+        if (rightCell != null) {
             if (rightCell.setNeighborArea(Direction.WEST, this)) {
                 this.neighborCells.put(Direction.EAST, rightCell);
-            }
-            else {
+            } else {
                 success = false;
             }
         }
@@ -115,27 +113,25 @@ public class BetweenCellsArea {
      * @param bottomCell нижняя ячейка.
      * @return успешность.
      */
-    boolean setVerticalNeighbors(AbstractCell topCell, AbstractCell bottomCell) {
+    boolean setVerticalNeighbors(Cell topCell, Cell bottomCell) {
         if (!canSetVerticalNeighbors(topCell, bottomCell)) return false;
 
         orientation = Orientation.HORIZONTAL;
 
         boolean success = true;
 
-        if (topCell != null){
+        if (topCell != null) {
             if (topCell.setNeighborArea(Direction.SOUTH, this)) {
                 this.neighborCells.put(Direction.NORTH, topCell);
-            }
-            else {
+            } else {
                 success = false;
             }
         }
 
-        if (bottomCell != null){
+        if (bottomCell != null) {
             if (bottomCell.setNeighborArea(Direction.NORTH, this)) {
                 this.neighborCells.put(Direction.SOUTH, bottomCell);
-            }
-            else {
+            } else {
                 success = false;
             }
         }
@@ -150,9 +146,9 @@ public class BetweenCellsArea {
      * @param rightCell ячейка справа.
      * @return возможность соседства.
      */
-    private boolean canSetHorizontalNeighbors(AbstractCell leftCell, AbstractCell rightCell) {
-        AbstractCell currentLeftCell = this.neighborCells.get(Direction.WEST);
-        AbstractCell currentRightCell = this.neighborCells.get(Direction.EAST);
+    private boolean canSetHorizontalNeighbors(Cell leftCell, Cell rightCell) {
+        Cell currentLeftCell = this.neighborCells.get(Direction.WEST);
+        Cell currentRightCell = this.neighborCells.get(Direction.EAST);
 
         if (currentLeftCell != null && !currentLeftCell.equals(leftCell)) return false;
         if (currentRightCell != null && !currentRightCell.equals(rightCell)) return false;
@@ -166,9 +162,9 @@ public class BetweenCellsArea {
      * @param bottomCell нижняя ячейка.
      * @return возможность соседства.
      */
-    private boolean canSetVerticalNeighbors(AbstractCell topCell, AbstractCell bottomCell) {
-        AbstractCell currentTopCell = this.neighborCells.get(Direction.NORTH);
-        AbstractCell currantBottomCell = this.neighborCells.get(Direction.SOUTH);
+    private boolean canSetVerticalNeighbors(Cell topCell, Cell bottomCell) {
+        Cell currentTopCell = this.neighborCells.get(Direction.NORTH);
+        Cell currantBottomCell = this.neighborCells.get(Direction.SOUTH);
 
         if (currentTopCell != null && !currentTopCell.equals(topCell)) return false;
         if (currantBottomCell != null && !currantBottomCell.equals(bottomCell)) return false;
