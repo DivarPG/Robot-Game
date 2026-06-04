@@ -77,7 +77,7 @@ public class FieldWidget extends JPanel {
 
         for(int i = 0; i < field.getWidth(); ++i) {
             Point point = new Point(i, rowIndex);
-            AbstractCell cell = field.getCell(point);
+            Cell cell = field.getCell(point);
             CellWidget cellWidget = widgetFactory.create(cell);
 
 
@@ -118,7 +118,7 @@ public class FieldWidget extends JPanel {
 
         for(int i = 0; i < field.getWidth(); ++i) {
             Point point = new Point(i, rowIndex);
-            AbstractCell cell = field.getCell(point);
+            Cell cell = field.getCell(point);
 
             BetweenCellsWidget betweenCellWidget = widgetFactory.create(cell.getNeighborArea(direction));
 
@@ -165,7 +165,7 @@ public class FieldWidget extends JPanel {
         @Override
         public void robotIsTeleported(@NotNull FieldActionEvent event) {
             Robot robot = event.getRobot();
-            AbstractCell teleport = event.getTeleport();
+            Cell teleport = event.getTeleport().getPosition();
             CellWidget teleportWidget = widgetFactory.getWidget(teleport);
             CellItemWidget robotWidget = widgetFactory.getWidget(robot);
             teleportWidget.removeItem(robotWidget);

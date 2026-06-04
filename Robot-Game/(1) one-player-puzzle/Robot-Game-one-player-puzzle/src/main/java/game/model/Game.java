@@ -34,7 +34,7 @@ public class Game {
 
         gameField = labyrinth.createField();
 
-        gameField.addFieldActionListener(new FieldObserver());
+        gameField.addFieldActionListener(new FieldObserver()); // как будто странная последовательность
 
         if (gameField == null) {
             throw new RuntimeException("No field created");

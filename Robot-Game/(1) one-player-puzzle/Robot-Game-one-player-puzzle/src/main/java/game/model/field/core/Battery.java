@@ -50,7 +50,7 @@ public class Battery extends CellObject {
      * @return заряд.
      */
     public int getCharge() {
-        if (isDestroy) {
+        if (isDestroyed) {
             throw new RuntimeException("Battery is destroyed");
         }
 
@@ -63,7 +63,7 @@ public class Battery extends CellObject {
      * @return емкость.
      */
     public int getCapacity() {
-        if (isDestroy) {
+        if (isDestroyed) {
             throw new RuntimeException("Battery is destroyed");
         }
 
@@ -77,7 +77,7 @@ public class Battery extends CellObject {
      * @return отданное кол-во заряда.
      */
     boolean drainCharge(int chargeAmount) {
-        if (isDestroy) {
+        if (isDestroyed) {
             throw new RuntimeException("Battery is destroyed");
         }
 
@@ -110,8 +110,8 @@ public class Battery extends CellObject {
      * @return успешность подключения.
      */
     boolean connectTo(Robot user) {
-        assert !isDestroy;
-        if (isDestroy) {
+        assert !isDestroyed;
+        if (isDestroyed) {
             return false;
         }
 
@@ -142,8 +142,8 @@ public class Battery extends CellObject {
      * @return успешность отключения
      */
     boolean disconnect() {
-        assert !isDestroy;
-        if (isDestroy) {
+        assert !isDestroyed;
+        if (isDestroyed) {
             return false;
         }
 
@@ -162,7 +162,7 @@ public class Battery extends CellObject {
             return false;
         }
 
-        isDestroy = false;
+        isDestroyed = false;
 
         return true;
     }
@@ -173,7 +173,7 @@ public class Battery extends CellObject {
      * @return подключена ли батарейка к потребителю.
      */
     public boolean isConnected() {
-        if (isDestroy) {
+        if (isDestroyed) {
             throw new RuntimeException("Battery is destroyed");
         }
 
@@ -185,8 +185,13 @@ public class Battery extends CellObject {
     //region ПОЗИЦИЯ
 
     @Override
-    protected boolean canSetPosition(@NotNull AbstractCell cell) {
+    protected boolean canChangePosition(@NotNull Cell cell) {
         return !this.isConnected() && getPosition() == null;
+    }
+
+    @Override
+    boolean canCoexistWith(Class<? extends CellObject> type) {
+        return type == Robot.class;
     }
 
     //endregion
@@ -196,16 +201,16 @@ public class Battery extends CellObject {
     /**
      * Батарейка уничтожена
      */
-    private boolean isDestroy = false;
+    private boolean isDestroyed = false;
 
     /**
      * Уничтожение батарейки.
      */
     void destroy() {
-        if (isDestroy()) return;
+        if (isDestroyed()) return;
 
         disconnect();
-        isDestroy = true;
+        isDestroyed = true;
     }
 
     /**
@@ -213,8 +218,8 @@ public class Battery extends CellObject {
      *
      * @return является ли батарейка уничтоженной.
      */
-    public boolean isDestroy() {
-        return isDestroy;
+    public boolean isDestroyed() {
+        return isDestroyed;
     }
 
     //endregion

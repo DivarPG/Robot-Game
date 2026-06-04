@@ -1,17 +1,17 @@
 package game.ui;
 
-import game.model.field.core.ExitCell;
-import game.model.field.core.NormalCell;
 import game.model.field.core.*;
 import game.model.field.core.Robot;
 import game.ui.obstacle.BetweenCellsWidget;
+<<<<<<< HEAD
 import game.ui.obstacle.wallcomponent.WallPieceWidget;
 import game.ui.obstacle.wallcomponent.WallWidget;
 import game.ui.resource.*;
 import game.ui.resource.image.ClasspathImageResourceProvider;
 import game.ui.resource.image.ImageResource;
+=======
+>>>>>>> origin/dev-model
 import org.jetbrains.annotations.NotNull;
-import game.ui.obstacle.ObstacleWidget;
 import game.ui.cell.*;
 
 import java.awt.image.BufferedImage;
@@ -31,7 +31,11 @@ public class WidgetFactory {
     public CellWidget create(@NotNull Cell cell) {
         if (cells.containsKey(cell)) return cells.get(cell);
 
+<<<<<<< HEAD
+        CellWidget item = (cell instanceof ExitCell) ? new ExitWidget(imageResourceProvider) : new CellWidget();
+=======
         CellWidget item = new CellWidget();
+>>>>>>> origin/dev-model
 
         Robot robot = (Robot) cell.getObject(Robot.class);
         if (robot != null) {
@@ -72,9 +76,13 @@ public class WidgetFactory {
         if (cellObject instanceof Robot) {
             createdWidget = new RobotWidget((Robot) cellObject, imageResourceProvider);
         } else if (cellObject instanceof Battery) {
+<<<<<<< HEAD
             createdWidget = new BatteryWidget((Battery) cellObject, imageResourceProvider);
+=======
+            createdWidget = new BatteryWidget((Battery) cellObject);
         } else if (cellObject instanceof ExitPoint) {
             createdWidget = new ExitWidget();
+>>>>>>> origin/dev-model
         } else {
             throw new IllegalArgumentException();
         }

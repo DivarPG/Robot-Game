@@ -5,6 +5,7 @@ import game.model.events.RobotActionEvent;
 import game.model.events.RobotActionListener;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * Робот.
@@ -32,28 +33,28 @@ public class Robot extends CellObject {
      * @param direction направление.
      */
     public boolean move(@NotNull Direction direction) {
+        if (!isCapable()) {
+            return false;
+        }
+
         if (getPosition().getNeighborObstacle(direction) != null) {
             System.out.println("Wall");
             return false;
         }
 
-        AbstractCell newPosition = getPosition().getNeighborCell(direction);
+        Cell newPosition = getPosition().getNeighborCell(direction);
 
-        if (newPosition == null || !newPosition.canSetBigObject()) {
+        if (newPosition == null || !newPosition.canSetObject(Robot.class)) {
             return false;
         }
 
-        boolean success = battery.drainCharge(AMOUNT_OF_CHARGE_FOR_MOVE);
+        battery.drainCharge(AMOUNT_OF_CHARGE_FOR_MOVE);
 
-        if (!success) {
-            return false;
-        }
+        Cell oldPosition = getPosition();
 
-        AbstractCell oldPosition = getPosition();
+        oldPosition.takeObject(Robot.class);
 
-        oldPosition.takeBigObject();
-
-        success = newPosition.setBigObject(this);
+        boolean success = newPosition.setObject(this);
 
         if (!success) {
             throw new RuntimeException("Robot can't move to the " + newPosition);
@@ -65,8 +66,13 @@ public class Robot extends CellObject {
     }
 
     @Override
-    protected boolean canSetPosition(@NotNull AbstractCell newPosition) {
+    protected boolean canChangePosition(@NotNull Cell newPosition) {
         return getPosition() == null;
+    }
+
+    @Override
+    boolean canCoexistWith(Class<? extends CellObject> type) {
+        return type != Robot.class;
     }
 
     /**
@@ -75,13 +81,8 @@ public class Robot extends CellObject {
      * @return дееспособен ли робот
      */
     public boolean isCapable() {
-        if (getPosition() instanceof NormalCell) {
-            NormalCell cell = (NormalCell) getPosition();
-            if (cell.getSmallObject() != null) {
-                return true;
-            }
-        }
-        return !isTeleported() && getCharge() > 0;
+        Cell cell = getPosition();
+        return cell.getObject(Robot.class) != null && !isTeleported() && hasEnoughCharge();
     }
 
     //endregion
@@ -134,7 +135,7 @@ public class Robot extends CellObject {
 
         boolean success = battery.disconnect();
 
-        assert success: "Disconnect failed";
+        assert success : "Disconnect failed";
         if (!success) {
             this.battery = battery;
             return false;
@@ -147,11 +148,11 @@ public class Robot extends CellObject {
      * Заменить источник питания {@link Robot#battery}.
      */
     public boolean changeBattery() {
-        if (getPosition() instanceof ExitCell) {
+        if (getPosition().getObject(ExitPoint.class) != null) {
             return false;
         }
 
-        Battery battery = ((NormalCell) getPosition()).takeSmallObject();
+        Battery battery = (Battery) getPosition().takeObject(Battery.class);
 
         if (battery == null) {
             return false;
@@ -172,6 +173,13 @@ public class Robot extends CellObject {
         fireRobotChangeBattery(battery);
 
         return true;
+    }
+
+    /**
+     * Проверить наличие достаточного для перемещения количества заряда {@link Robot#battery}.
+     */
+    private boolean hasEnoughCharge() {
+        return getCharge() >= AMOUNT_OF_CHARGE_FOR_MOVE;
     }
 
     //region ЁМКОСТЬ
@@ -254,7 +262,7 @@ public class Robot extends CellObject {
      * @param oldPosition ячейка откуда переместился робот.
      * @param newPosition ячейка куда переместился робот.
      */
-    private void fireRobotIsMoved(@NotNull AbstractCell oldPosition, @NotNull AbstractCell newPosition) {
+    private void fireRobotIsMoved(@NotNull Cell oldPosition, @NotNull Cell newPosition) {
         RobotActionEvent event = new RobotActionEvent(this);
         event.setRobot(this);
         event.setFromCell(oldPosition);

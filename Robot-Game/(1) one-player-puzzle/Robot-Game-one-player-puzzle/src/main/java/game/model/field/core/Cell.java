@@ -7,67 +7,106 @@ import java.util.*;
 /**
  * Ячейка.
  */
-public abstract class AbstractCell {
+public class Cell {
 
     //region ОБЪЕКТ В ЯЧЕЙКЕ
-
+    private final int MAX_OBJECT_COUNT = 2;
     /**
-     * Крупный объект, расположенный в ячейке.
+     * Список объектов, расположенных в ячейке.
      */
-    private Robot bigObject = null;
+    private Map<Class<? extends CellObject>, CellObject> _objects = new HashMap<>();
 
     /**
-     * Получить крупный объект.
+     * Получить объект по типу.
      *
-     * @return крупный объект.
+     * @param type класс объекта, который нужно получить.
+     * @return первый найденный запрашиваемый объект, null - если объект не содержится в ячейке {@link Cell#_objects}.
      */
-    public Robot getBigObject() {
-        return bigObject;
+    public CellObject getObject(Class<? extends CellObject> type) {
+        return _objects.getOrDefault(type, null);
     }
 
     /**
-     * Поместить крупный объект в ячейку {@link AbstractCell#bigObject}.
+     * Поместить объект в ячейку {@link Cell#_objects}.
      *
-     * @param bigObject объект, добавляемый в ячейку.
+     * @param object объект, добавляемый в ячейку.
+     * @return успешность.
+     * @throws IllegalArgumentException если запрашиваемый класс не является поддерживаемым абстрактным классом.
      */
-    public boolean setBigObject(@NotNull Robot bigObject) {
-        if (!this.canSetBigObject()) {
+    public boolean setObject(CellObject object) {
+        Class<? extends CellObject> type = object.getClass();
+
+        if (!canSetObject(type)) {
             return false;
         }
 
-        boolean success = bigObject.setPosition(this);
+        boolean success = object.setPosition(this);
         if (!success) {
             return false;
         }
 
-        this.bigObject = bigObject;
+        _objects.put(type, object);
 
+        tryActivateSelfActivatingObject();
         return true;
     }
 
     /**
-     * Может принять крупный объект.
+     * Может принять объект.
      *
-     * @return может принять крупный объект.
+     * @param type класс объекта, который нужно проверить.
+     * @return может принять объект.
      */
-    public boolean canSetBigObject() {
-        return getBigObject() == null;
+    public boolean canSetObject(@NotNull Class<? extends CellObject> type) {
+        boolean canCoexist = true;
+
+        for (CellObject obj : _objects.values()) {
+            canCoexist = canCoexist && obj.canCoexistWith(type);
+        }
+
+        return (_objects.size() < MAX_OBJECT_COUNT) && canCoexist;
     }
 
     /**
-     * Изъять крупный объект из ячейки.
+     * Изъять объект из ячейки.
      *
-     * @return запрашиваемый объект, null - если объект не содержится в ячейке {@link AbstractCell#bigObject}.
+     * @return запрашиваемый объект, null - если объект не содержится в ячейке {@link Cell#_objects}.
      */
-    public Robot takeBigObject() {
-        Robot result = bigObject;
+    public CellObject takeObject(Class<? extends CellObject> type) {
+        CellObject result = _objects.remove(type);
 
         if (result != null) {
             result.unsetPosition();
-            bigObject = null;
         }
 
         return result;
+    }
+
+    /**
+     * Получить список типов всех объектов, хранящихся в ячейке.
+     *
+     * @return список типов всех объектов, хранящихся в ячейке.
+     */
+    public Set<Class<? extends CellObject>> objectTypes() {
+        return Collections.unmodifiableSet(_objects.keySet());
+    }
+    //endregion
+
+    //region САМОАКТИВИРУЮЩИЙСЯ ОБЪЕКТ
+
+    /**
+     * Вызывает взаимодействие для самоактивирующегося объекта, если есть самоактивирующийся объект
+     * и количество объектов в ячейке больше одного.
+     */
+    private void tryActivateSelfActivatingObject() {
+        ExitPoint exitPoint = (ExitPoint) getObject(ExitPoint.class);
+        if (exitPoint != null && _objects.size() > 1) {
+            for (CellObject obj : _objects.values()) {
+                if (!obj.equals(exitPoint)) {
+                    exitPoint.execute(obj);
+                }
+            }
+        }
     }
 
     //endregion
@@ -80,7 +119,7 @@ public abstract class AbstractCell {
      * @param direction направление.
      * @return соседняя ячейка, null, если в заданном направлении нет соседней ячейки.
      */
-    public AbstractCell getNeighborCell(@NotNull Direction direction) {
+    public Cell getNeighborCell(@NotNull Direction direction) {
         BetweenCellsArea area = neighborAreas.get(direction);
         if (area == null) {
             return null;
@@ -95,8 +134,8 @@ public abstract class AbstractCell {
      * @param neighborCells список ячеек с соответствующими направлениями соседства.
      * @return успешность.
      */
-    boolean setNeighbors(Map<Direction, AbstractCell> neighborCells) {
-        if (neighborCells != null){
+    boolean setNeighbors(Map<Direction, Cell> neighborCells) {
+        if (neighborCells != null) {
             for (Direction direction : neighborCells.keySet()) {
                 if (!setNeighbor(neighborCells.get(direction), direction)) return false;
             }
@@ -115,8 +154,10 @@ public abstract class AbstractCell {
      * @return успешность.
      * @throws IllegalArgumentException если переданная ячейка не может быть соседней.
      */
-    private boolean setNeighbor(@NotNull AbstractCell neighborCell, @NotNull Direction direction) {
-        if (this == neighborCell) { return false; }
+    private boolean setNeighbor(@NotNull Cell neighborCell, @NotNull Direction direction) {
+        if (this == neighborCell) {
+            return false;
+        }
         BetweenCellsArea area = neighborCell.getNeighborArea(direction.getOppositeDirection());
         return switch (direction) {
             case NORTH -> area.setVerticalNeighbors(neighborCell, this);
@@ -136,7 +177,7 @@ public abstract class AbstractCell {
     private final Map<Direction, BetweenCellsArea> neighborAreas = new EnumMap<>(Direction.class);
 
     /**
-     * Получить соседнюю область, располагающуюся между ячейками {@link AbstractCell#neighborAreas} в заданном направлении.
+     * Получить соседнюю область, располагающуюся между ячейками {@link Cell#neighborAreas} в заданном направлении.
      *
      * @param direction направление.
      * @return соседняя область, располагающийся между ячейками в заданном направлении.
@@ -148,7 +189,7 @@ public abstract class AbstractCell {
     /**
      * Задать соседнюю область между ячейками.
      *
-     * @param direction направление.
+     * @param direction    направление.
      * @param neighborArea соседняя область между ячейками.
      * @return успешность.
      */
@@ -195,7 +236,7 @@ public abstract class AbstractCell {
      * Установить соседнее препятствие.
      *
      * @param direction направление.
-     * @param obstacle соседнее препятствие.
+     * @param obstacle  соседнее препятствие.
      * @return успешность.
      */
     public boolean setNeighborObstacle(@NotNull Direction direction, @NotNull BetweenCellObject obstacle) {

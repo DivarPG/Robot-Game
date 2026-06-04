@@ -15,12 +15,11 @@ public class Field {
     /**
      * Конструктор.
      *
-     * @param width     ширина. Должна быть > 0.
-     * @param height    высота. Должна быть > 0.
-     * @param exitPoint координата ячейки выхода.
+     * @param width  ширина. Должна быть > 0.
+     * @param height высота. Должна быть > 0.
      * @throws IllegalArgumentException если ширина, высота или координата ячейки переданы некорректные.
      */
-    public Field(int width, int height, @NotNull Point exitPoint) {
+    public Field(int width, int height) {
         if (width <= 0) {
             throw new IllegalArgumentException("Field width must be more than 0");
         }
@@ -29,31 +28,24 @@ public class Field {
             throw new IllegalArgumentException("Field height must be more than 0");
         }
 
-        if (exitPoint.getX() >= width || exitPoint.getY() >= height) {
-            throw new IllegalArgumentException("exit point coordinates must be in range from 0 to weight or height");
-        }
-
         this.width = width;
         this.height = height;
 
-        buildField(exitPoint);
-
-        this.exitCell = (ExitCell) getCell(exitPoint);
-        this.exitCell.addExitCellActionListener(new ExitCellObserver());
+        buildField();
     }
 
     /**
      * Построить игровое поле.
      *
-     * @param exitPoint координата ячейки выхода.
+     *
      */
-    private void buildField(Point exitPoint) {
+    private void buildField() {
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 Point p = new Point(x, y);
-                AbstractCell cell = p.equals(exitPoint) ? new ExitCell() : new NormalCell();
+                Cell cell = new Cell();
 
-                Map<Direction, AbstractCell> neighborCells = new HashMap<>();
+                Map<Direction, Cell> neighborCells = new HashMap<>();
 
                 if (x > 0) {
                     neighborCells.put(Direction.WEST, getCell(p.to(Direction.WEST, 1)));
@@ -114,9 +106,19 @@ public class Field {
     //region ТОЧКА ВЫХОДА
 
     /**
-     * Ячейка выхода.
+     * Получить точку выхода на поле.
+     *
+     * @return точка выхода на поле.
      */
-    private final ExitCell exitCell;
+    public ExitPoint getExitPoint() {
+        for (Cell cell : cells.values()) {
+            ExitPoint exit = (ExitPoint) cell.getObject(ExitPoint.class);
+            if (exit != null) {
+                return exit;
+            }
+        }
+        return null;
+    }
 
     //endregion
 
@@ -127,7 +129,7 @@ public class Field {
     /**
      * Ячейки поля.
      */
-    private final Map<Point, AbstractCell> cells = new HashMap<>();
+    private final Map<Point, Cell> cells = new HashMap<>();
 
     /**
      * Получить ячейку по заданной координате.
@@ -135,7 +137,7 @@ public class Field {
      * @param point координата.
      * @return ячейка.
      */
-    public AbstractCell getCell(@NotNull Point point) {
+    public Cell getCell(@NotNull Point point) {
         return cells.get(point);
     }
 
@@ -149,8 +151,8 @@ public class Field {
      * @return робот на поле.
      */
     public Robot getRobot() {
-        for (var cell : cells.entrySet()) {
-            Robot robot = cell.getValue().getBigObject();
+        for (Cell cell : cells.values()) {
+            Robot robot = (Robot) cell.getObject(Robot.class);
             if (robot != null) {
                 return robot;
             }
@@ -163,12 +165,12 @@ public class Field {
     //region СЛУШАТЕЛИ
 
     /**
-     * Класс, реализующий наблюдение за событиями {@link ExitCellActionListener}.
+     * Класс, реализующий наблюдение за событиями {@link ExitPointActionListener}.
      */
-    class ExitCellObserver implements ExitCellActionListener {
+    class ExitPointObserver implements ExitPointActionListener {
 
         @Override
-        public void robotIsTeleported(@NotNull ExitCellActionEvent event) {
+        public void robotIsTeleported(@NotNull ExitPointActionEvent event) {
             fireRobotIsTeleported(event.getTeleport());
         }
     }
@@ -205,9 +207,9 @@ public class Field {
      *
      * @param teleport телепорт.
      */
-    private void fireRobotIsTeleported(@NotNull AbstractCell teleport) {
+    private void fireRobotIsTeleported(@NotNull ExitPoint teleport) {
         FieldActionEvent event = new FieldActionEvent(this);
-        event.setRobot(((ExitCell) teleport).getTeleportedRobot());
+        event.setRobot((teleport.getTeleportedRobot()));
         event.setTeleport(teleport);
 
         for (FieldActionListener listener : fieldListListener) {
@@ -231,14 +233,12 @@ public class Field {
 
         Field field = (Field) o;
 
-        return width == field.width && height == field.height &&
-                Objects.equals(cells, field.cells) &&
-                Objects.equals(exitCell, field.exitCell);
+        return width == field.width && height == field.height && Objects.equals(cells, field.cells) && Objects.equals(getExitPoint(), field.getExitPoint());
     }
 
     @Override
     public String toString() {
-        return "Field{" + "cells=" + cells + ", width=" + width + ", height=" + height + ", exitPoint=" + exitCell + '}';
+        return "Field{" + "cells=" + cells + ", width=" + width + ", height=" + height + ", exitPoint=" + getExitPoint() + '}';
     }
 
     //endregion

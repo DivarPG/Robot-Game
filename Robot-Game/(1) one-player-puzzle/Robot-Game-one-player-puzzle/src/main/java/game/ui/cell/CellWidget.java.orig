@@ -1,8 +1,12 @@
 package game.ui.cell;
 
+<<<<<<< HEAD
+import game.model.field.core.AbstractCell;
+=======
 import game.model.field.core.Cell;
 import game.ui.utils.ImageUtils;
 
+>>>>>>> origin/dev-model
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;

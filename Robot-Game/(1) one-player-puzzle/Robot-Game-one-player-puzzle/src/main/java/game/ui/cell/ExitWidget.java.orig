@@ -1,19 +1,41 @@
 package game.ui.cell;
 
+<<<<<<< HEAD
+import game.model.field.core.ExitCell;
+import game.ui.resource.*;
+import game.ui.resource.image.ImageResource;
+import game.ui.resource.image.WithImageResource;
+import game.ui.utils.ImageScaler;
+=======
 import game.model.field.core.ExitPoint;
 import game.ui.utils.ImageUtils;
+>>>>>>> origin/dev-model
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Виджет ячейки выхода.
  *
  * @see ExitPoint
  */
+<<<<<<< HEAD
+public class ExitWidget extends CellWidget implements WithImageResource {
+
+    private final BufferedImage image;
+
+    public ExitWidget( ResourceProvider<BufferedImage, ImageResource> provider) {
+
+        this.image  = getImage(provider);
+        setPreferredSize(new Dimension(150, 150));
+        setOpaque(true);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(image, 0, 0, null);
+=======
 public class ExitWidget extends CellItemWidget {
 
     @Override
@@ -25,6 +47,18 @@ public class ExitWidget extends CellItemWidget {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return image;
+    }
+
+    @Override
+    public CellWidget.Layer getLayer() {
+        return CellWidget.Layer.TOP;
+    }
+
+    @Override
+    protected Dimension getDimension() {
+        return new Dimension(120, 120);
+>>>>>>> origin/dev-model
     }
 
     @Override
