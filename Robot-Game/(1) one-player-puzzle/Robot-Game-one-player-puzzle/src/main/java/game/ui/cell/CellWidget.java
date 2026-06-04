@@ -1,7 +1,6 @@
 package game.ui.cell;
 
 import game.model.field.core.Cell;
-import game.ui.utils.ImageUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +48,7 @@ public class CellWidget extends JPanel {
      * @throws IllegalArgumentException если объектов добавляется больше 2.
      */
 
-//    public void addItem_old(CellItemWidget item) {
+//    public void addItem(CellItemWidget item) {
 //
 //        Dimension size = item.getDimension();
 //

@@ -1,19 +1,14 @@
 package game.ui;
 
-import game.model.field.core.ExitCell;
-import game.model.field.core.NormalCell;
 import game.model.field.core.*;
 import game.model.field.core.Robot;
 import game.ui.obstacle.BetweenCellsWidget;
-import game.ui.obstacle.wallcomponent.WallPieceWidget;
-import game.ui.obstacle.wallcomponent.WallWidget;
+import game.ui.obstacle.wallcomponent.WallBuilder;
 import game.ui.resource.*;
 import game.ui.resource.image.ClasspathImageResourceProvider;
 import game.ui.resource.image.ImageResource;
 import org.jetbrains.annotations.NotNull;
-import game.ui.obstacle.ObstacleWidget;
 import game.ui.cell.*;
-
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +21,8 @@ public class WidgetFactory {
 
     private final ResourceProvider<BufferedImage, ImageResource> imageResourceProvider =
             new CachedResourceProvider<>(new ClasspathImageResourceProvider());
+
+    private final WallBuilder wallBuilder = new WallBuilder(imageResourceProvider);
 
     /*---------- AbstractCell ----------*/
     public CellWidget create(@NotNull Cell cell) {
@@ -74,7 +71,7 @@ public class WidgetFactory {
         } else if (cellObject instanceof Battery) {
             createdWidget = new BatteryWidget((Battery) cellObject, imageResourceProvider);
         } else if (cellObject instanceof ExitPoint) {
-            createdWidget = new ExitWidget();
+            createdWidget = new ExitWidget(imageResourceProvider);
         } else {
             throw new IllegalArgumentException();
         }
@@ -97,53 +94,21 @@ public class WidgetFactory {
 
         BetweenCellsWidget createdWidget = new BetweenCellsWidget(betweenCellsArea, imageResourceProvider);
 
+//        if (betweenCellsArea.getObstacle() != null) {
+//            buildWall(betweenCellsArea, createdWidget);
+//        }
+
         if (betweenCellsArea.getObstacle() != null) {
-            buildWall(betweenCellsArea, createdWidget);
+            wallBuilder.build(
+                    betweenCellsArea,
+                    createdWidget,
+                    this
+            );
         }
 
         betweenCellsAreas.put(betweenCellsArea, createdWidget);
 
         return createdWidget;
-    }
-
-
-    private void buildWall(BetweenCellsArea area, BetweenCellsWidget widget) {
-
-        for (Direction d : Direction.values()) {
-
-            AbstractCell a = area.getNeighborCell(d);
-            AbstractCell b = area.getNeighborCell(d);
-
-            if (a == null || b == null) continue;
-
-            CellWidget wa = getOrCreateCellWidget(a);
-            CellWidget wb = getOrCreateCellWidget(b);
-
-            WallPieceWidget waPiece = new WallPieceWidget(wa, imageResourceProvider, d);
-            WallPieceWidget wbPiece = new WallPieceWidget(wb, imageResourceProvider, d);
-
-            wa.addItem(waPiece);
-            wb.addItem(wbPiece);
-
-            if (widget.getComponentCount() == 0) {
-                widget.setObstacle(new WallWidget(toOrientation(d), imageResourceProvider));
-            }
-        }
-    }
-
-    private CellWidget getOrCreateCellWidget(AbstractCell cell) {
-        CellWidget widget = cells.get(cell);
-        if (widget != null) return widget;
-
-        widget = create(cell);
-        cells.put(cell, widget);
-        return widget;
-    }
-
-    private Orientation toOrientation(Direction d) {
-        return (d == Direction.EAST || d == Direction.WEST)
-                ? Orientation.VERTICAL
-                : Orientation.HORIZONTAL;
     }
 
     public BetweenCellsWidget getWidget(@NotNull BetweenCellsArea betweenCellsArea) {

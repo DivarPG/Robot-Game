@@ -1,13 +1,11 @@
 package game.ui.cell;
 
 import game.model.field.core.ExitPoint;
-import game.ui.utils.ImageUtils;
-
-import javax.imageio.ImageIO;
+import game.ui.resource.ResourceProvider;
+import game.ui.resource.image.ImageResource;
+import game.ui.utils.ImageScaler;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Виджет ячейки выхода.
@@ -16,15 +14,13 @@ import java.io.IOException;
  */
 public class ExitWidget extends CellItemWidget {
 
-    @Override
-    protected BufferedImage getImage() {
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(new File(ImageUtils.IMAGE_PATH + "exit.png"));
-            image = ImageUtils.resizeImage(image, 120, 100);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    /**
+     * Конструктор.
+     *
+     * @param imageProvider
+     */
+    public ExitWidget(ResourceProvider<BufferedImage, ImageResource> imageProvider) {
+        super(imageProvider);
     }
 
     @Override
@@ -38,17 +34,20 @@ public class ExitWidget extends CellItemWidget {
        return ImageScaler.resize(original, 120, 120);
     }
 
-//    @Override
-//    protected void paintComponent(Graphics g) {
-//        super.paintComponent(g);
-//
-//        try {
-//            BufferedImage image = ImageIO.read(new File(ImageUtils.IMAGE_PATH + "exit.png"));
-//            image = ImageUtils.resizeImage(image, 120, 120);
-//            g.drawImage(image, 0, 0, null);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    @Override
+    public CellLayout.Zone getZone() {
+        return CellLayout.Zone.PRIMARY;
+    }
+
+    @Override
+    protected Dimension getDimension() {
+        return new Dimension(150, 150);
+    }
+
+    @Override
+    public int getZIndex() {return 50;}
+
+
+
 
 }

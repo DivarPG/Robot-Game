@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class WallPieceWidget extends CellItemWidget implements WallComponent {
+public class WallPieceWidget extends CellItemWidget{
 
     private final CellWidget cell;
     private final Direction direction;
@@ -58,10 +58,5 @@ public class WallPieceWidget extends CellItemWidget implements WallComponent {
     @Override
     public BufferedImage getImage(ResourceProvider<BufferedImage, ImageResource> provider) {
         return provider.get(getImageType());
-    }
-
-    @Override
-    public void install() {
-        cell.addItem(this);
     }
 }

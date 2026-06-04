@@ -40,12 +40,6 @@ public abstract class CellItemWidget extends JPanel implements WithImageResource
         setOpaque(false);
     }
 
-    /**
-     * Получить слой на котором располагается виджет.
-     *
-     * @return слой на котором располагается виджет.
-     */
-    //public abstract Layer getLayer();
 
     /**
      * Получить размеры виджета.
@@ -69,14 +63,6 @@ public abstract class CellItemWidget extends JPanel implements WithImageResource
 
         g.drawImage(img, x, y, iw, ih, null);
     }
-
-//    @Override
-//    protected void paintComponent(Graphics g) {
-//        super.paintComponent(g);
-//
-//       drawImage(g);
-//       drawOverlay(g);
-//    }
 
     @Override
     protected void paintComponent(Graphics g) {

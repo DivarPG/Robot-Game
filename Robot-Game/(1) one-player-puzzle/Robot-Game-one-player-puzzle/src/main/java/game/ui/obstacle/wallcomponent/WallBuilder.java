@@ -5,9 +5,10 @@ import game.ui.cell.CellWidget;
 import game.ui.obstacle.BetweenCellsWidget;
 import game.ui.resource.ResourceProvider;
 import game.ui.resource.image.ImageResource;
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.image.BufferedImage;
+import game.model.field.core.*;
+import game.ui.WidgetFactory;
+
 
 public class WallBuilder {
 
@@ -17,31 +18,23 @@ public class WallBuilder {
         this.provider = provider;
     }
 
-    public void build(@NotNull BetweenCellsArea area, CellWidget a,
-                      CellWidget b,@NotNull BetweenCellsWidget between) {
+    public void build(BetweenCellsArea area, BetweenCellsWidget between, WidgetFactory factory) {
 
-        Direction dir = detectDirection(area);
-        if (dir == null) return;
-
-
-        WallPieceWidget aWall = new WallPieceWidget(a, provider, dir);
-        WallPieceWidget bWall = new WallPieceWidget(b, provider, dir);
-
-        WallWidget middle = new WallWidget(toOrientation(dir), provider);
-
-        a.addItem(aWall);
-        b.addItem(bWall);
-        between.setObstacle(middle);
-    }
-
-    private Direction detectDirection(BetweenCellsArea area) {
         for (Direction d : Direction.values()) {
-            if (area.getNeighborCell(d) != null &&
-                    area.getNeighborCell(d) != null) {
-                return d;
+
+            Cell cell = area.getNeighborCell(d);
+
+            if (cell == null) {continue;}
+
+            //гарантируем что он всегда есть
+            CellWidget widget = factory.create(cell);
+
+            widget.addItem( new WallPieceWidget(widget, provider, d));
+
+            if (between.getComponentCount() == 0) {
+                between.setObstacle(new WallWidget(toOrientation(d), provider));
             }
         }
-        return null;
     }
 
     private Orientation toOrientation(Direction d) {

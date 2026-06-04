@@ -1,12 +1,11 @@
 package game.ui.cell;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 
-//         * делится на три зоны зоны - основную (одна), вторичную (одня) и стенную (четыре)
+// * делится на три зоны зоны - основную (одна), вторичную (одня) и стенную (четыре)
 // *
 //         * основная
 // * - зона для основных элементов клетки (робот, портал)
@@ -16,8 +15,7 @@ import java.util.Map;
 // *
 //         *  стенная
 // *  - зона для компонентов межкклеточных элементов (стены)
-// *
-//
+
 
 public class CellLayout implements LayoutManager2 {
 

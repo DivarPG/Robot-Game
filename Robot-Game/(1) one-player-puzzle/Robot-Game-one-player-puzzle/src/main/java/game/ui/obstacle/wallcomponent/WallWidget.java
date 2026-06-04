@@ -21,8 +21,6 @@ public class WallWidget extends ObstacleWidget {
     public WallWidget( Orientation orientation, ResourceProvider<BufferedImage,ImageResource> provider) {
 
         super(orientation, provider);
-
-     //   this.parent = parent;
     }
 
     @Override
@@ -30,7 +28,7 @@ public class WallWidget extends ObstacleWidget {
 
         BufferedImage original = provider.get(getImageType());
 
-     //BufferedImage resized =ImageUtils.resizeImage(original, 120, 120);
+        //BufferedImage resized =ImageUtils.resizeImage(original, 120, 120);
 
         return original;
     }
