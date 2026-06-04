@@ -5,10 +5,14 @@ import game.model.field.core.Robot;
 import game.ui.obstacle.BetweenCellsWidget;
 import game.ui.obstacle.wallcomponent.WallBuilder;
 import game.ui.resource.*;
+import game.ui.resource.gif.ClasspathGifResourceProvider;
+import game.ui.resource.gif.GifResource;
 import game.ui.resource.image.ClasspathImageResourceProvider;
 import game.ui.resource.image.ImageResource;
 import org.jetbrains.annotations.NotNull;
 import game.ui.cell.*;
+
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +25,9 @@ public class WidgetFactory {
 
     private final ResourceProvider<BufferedImage, ImageResource> imageResourceProvider =
             new CachedResourceProvider<>(new ClasspathImageResourceProvider());
+
+    private final ResourceProvider<ImageIcon, GifResource> gifResourceProvider =
+            new CachedResourceProvider<>(new ClasspathGifResourceProvider());
 
     private final WallBuilder wallBuilder = new WallBuilder(imageResourceProvider);
 
@@ -71,7 +78,7 @@ public class WidgetFactory {
         } else if (cellObject instanceof Battery) {
             createdWidget = new BatteryWidget((Battery) cellObject, imageResourceProvider);
         } else if (cellObject instanceof ExitPoint) {
-            createdWidget = new ExitWidget(imageResourceProvider);
+            createdWidget = new ExitWidget(gifResourceProvider);
         } else {
             throw new IllegalArgumentException();
         }
