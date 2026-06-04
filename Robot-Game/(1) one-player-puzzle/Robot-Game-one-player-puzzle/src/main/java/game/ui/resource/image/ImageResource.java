@@ -1,0 +1,44 @@
+package game.ui.resource.image;
+
+
+import game.ui.resource.ResourceDescriptor;
+import org.jetbrains.annotations.NotNull;
+
+import javax.lang.model.element.ModuleElement;
+
+/**
+* Список типизированных расположений изображений
+*/
+public enum ImageResource implements ResourceDescriptor {
+
+    // изображение робота
+    ROBOT("robot/Robot.png"),
+
+    // изображение батарейки
+    BATTERY_FULL("battery/Battery_green.png"),
+    BATTERY_MEDIUM("battery/Battery_yellow.png"),
+    BATTERY_LOW("battery/Battery_red.png"),
+
+    // изображение стены
+    WALL_VERTICAL("wall_vertical.png"),
+    WALL_HORIZONTAL("wall_horizontal.png"),
+
+    PORTAL("field/Portal.png"),
+
+    EXIT("exit.png");
+
+    private final String path;
+
+    ImageResource(String path){
+        this.path = path;
+    }
+
+    // дилема !!!
+    // без интерфейса хорошо что он пакетный , но интерфейс
+    // четка заявит что должен быть метод получения пути в формате строки
+
+    @Override
+    public String getPath(){
+        return path;
+    }
+}

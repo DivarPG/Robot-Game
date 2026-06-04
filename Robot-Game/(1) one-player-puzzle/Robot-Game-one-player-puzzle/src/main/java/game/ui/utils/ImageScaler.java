@@ -3,8 +3,9 @@ package game.ui.utils;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class ImageUtils {
-    public static BufferedImage resizeImage(BufferedImage img, Integer width, Integer height) {
+public final class ImageScaler {
+
+    public static BufferedImage resize(BufferedImage img, Integer width, Integer height) {
         Image tmpImg = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
@@ -14,8 +15,4 @@ public class ImageUtils {
 
         return bufferedImage;
     }
-
-    public static final String IMAGE_PATH = "src/main/resources/";
-
-    public static final Color BACKGROUND_COLOR = Color.decode("#888888");
 }

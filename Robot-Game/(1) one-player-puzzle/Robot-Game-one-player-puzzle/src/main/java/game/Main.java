@@ -7,8 +7,6 @@ import game.model.events.GameActionListener;
 import game.model.labyrinths.SmallLabyrinth;
 import game.ui.FieldWidget;
 import game.ui.WidgetFactory;
-import game.ui.cell.RobotWidget;
-import game.ui.utils.GameWidgetsUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -105,9 +103,7 @@ public class Main {
                     String message = "";
                     switch (status) {
                         case WIN:
-                            message = "Выиграл робот: " + GameWidgetsUtils.colorName(
-                                    ((RobotWidget) widgetFactory.getWidget(game.getRobot())).getColor()
-                            );
+                            message = "Вы выиграли";
                             break;
                         case GAME_ABORTED:
                             message = "Игра завершена досрочно";

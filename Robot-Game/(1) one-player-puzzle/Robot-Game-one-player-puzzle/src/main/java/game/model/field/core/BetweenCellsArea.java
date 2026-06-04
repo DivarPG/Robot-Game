@@ -25,6 +25,10 @@ public class BetweenCellsArea {
         return obstacle;
     }
 
+//    public Set<Direction> getDirections() {
+//        return neighborCells.keySet();
+//    }
+
     /**
      * Поместить препятствие в область {@link BetweenCellsArea#obstacle}.
      *

@@ -1,11 +1,15 @@
 package game.ui.obstacle;
 
 import game.model.field.core.BetweenCellsArea;
+import game.ui.obstacle.wallcomponent.WallWidget;
+import game.ui.resource.image.ImageResource;
+import game.ui.resource.ResourceProvider;
 import org.jetbrains.annotations.NotNull;
 import game.model.field.core.Orientation;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * Виджет контейнера для виджетов между ячейками {@link BetweenCellsWidget}.
@@ -17,16 +21,44 @@ public class BetweenCellsWidget extends JPanel {
     private final Orientation orientation;
 
     /**
+     * Размер элемента.
+     */
+    private static final Dimension SIZE_HORIZONTAL = new Dimension(5, 5);
+
+    private static final Dimension SIZE_VERTICAL = new Dimension(5, 5);
+
+
+
+    /// фуфуфуфуфуфуфуфуфуфу!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    /**
      * Конструктор.
      *
      * @param betweenCellsArea область между клетками.
      */
-    public BetweenCellsWidget(@NotNull BetweenCellsArea betweenCellsArea) {
+    public BetweenCellsWidget(@NotNull BetweenCellsArea betweenCellsArea,  ResourceProvider<BufferedImage, ImageResource> provider) {
         super(new BorderLayout());
+
+
         this.orientation = betweenCellsArea.getOrientation();
-        if (betweenCellsArea.getObstacle() != null) { setItem(new WallWidget(orientation)); }
+        // if (betweenCellsArea.getObstacle() != null) { setItem(new WallWidget(orientation,provider)); }
         setPreferredSize(getDimensionByOrientation());
-        setBackground(Color.darkGray);
+        setBackground(Color.DARK_GRAY);
+
+        setOpaque(true);
+
+    }
+
+    public void setObstacle(@NotNull ObstacleWidget obstacleWidget) {
+
+//        if (obstacleWidget.getOrientation() != orientation) {
+//            throw new IllegalArgumentException("Obstacle orientation mismatch");
+//        }
+
+        add(obstacleWidget, BorderLayout.CENTER);
+
+        revalidate();
+        repaint();
     }
 
     /**
@@ -37,7 +69,7 @@ public class BetweenCellsWidget extends JPanel {
      */
     private void setItem(@NotNull ObstacleWidget obstacleWidget) {
         if (obstacleWidget.getOrientation() != orientation) throw new IllegalArgumentException();
-        add(obstacleWidget);
+        add(obstacleWidget, BorderLayout.CENTER);
     }
 
     /**
@@ -46,6 +78,6 @@ public class BetweenCellsWidget extends JPanel {
      * @return размеры.
      */
     private Dimension getDimensionByOrientation() {
-        return (orientation == Orientation.VERTICAL) ? new Dimension(5, 120) : new Dimension(125, 5);
+        return (orientation == Orientation.VERTICAL) ? SIZE_VERTICAL : SIZE_HORIZONTAL;
     }
 }

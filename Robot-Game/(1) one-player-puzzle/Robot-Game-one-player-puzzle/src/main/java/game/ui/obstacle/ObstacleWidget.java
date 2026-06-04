@@ -1,24 +1,36 @@
 package game.ui.obstacle;
 
 import game.model.field.core.Orientation;
-import game.ui.utils.ImageUtils;
+import game.ui.resource.image.ImageResource;
+import game.ui.resource.ResourceProvider;
+import game.ui.resource.image.WithImageResource;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+
 
 /**
  * Виджет препятствия, расположенного между ячейками.
  */
-public abstract class ObstacleWidget extends JPanel {
+public abstract class ObstacleWidget extends JPanel implements WithImageResource {
 
     /**
      * Ориентация.
      */
     protected final Orientation orientation;
+
+
+    /**
+     * Размер элемента.
+     */
+    private static final Dimension SIZE_HORIZONTAL = new Dimension(10, 5);
+
+    private static final Dimension SIZE_VERTICAL = new Dimension(5, 10);
+
+
+
+    private final  ResourceProvider<BufferedImage,ImageResource> provider;
 
     /**
      * Получить ориентацию {@link ObstacleWidget#orientation}.
@@ -34,40 +46,20 @@ public abstract class ObstacleWidget extends JPanel {
      *
      * @param orientation ориентация.
      */
-    public ObstacleWidget(Orientation orientation) {
+    public ObstacleWidget(Orientation orientation,  ResourceProvider<BufferedImage, ImageResource> provider) {
         this.orientation = orientation;
+        this.provider = provider;
         setPreferredSize(getDimensionByOrientation());
+        setOpaque(false);
     }
-
-    /**
-     * Получить изображение виджета.
-     *
-     * @return изображение виджета.
-     */
-    private BufferedImage getImage() {
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(getImageFile());
-            Dimension dimension = getDimensionByOrientation();
-            image = ImageUtils.resizeImage(image, dimension.width, dimension.height);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return image;
-    }
-
-    /**
-     * Получить файл изображения.
-     *
-     * @return файл изображения.
-     */
-    protected abstract File getImageFile();
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(getImage(), 0, 0, null);
+        g.drawImage(getImage(provider), 0, 0, null);
     }
+
+
 
     /**
      * Получить размеры виджеты по ориентации.
@@ -75,6 +67,6 @@ public abstract class ObstacleWidget extends JPanel {
      * @return размеры виджета.
      */
     protected Dimension getDimensionByOrientation() {
-        return (orientation == Orientation.VERTICAL) ? new Dimension(5, 120) : new Dimension(125, 5);
+        return (orientation == Orientation.VERTICAL) ? SIZE_VERTICAL : SIZE_HORIZONTAL;
     }
 }

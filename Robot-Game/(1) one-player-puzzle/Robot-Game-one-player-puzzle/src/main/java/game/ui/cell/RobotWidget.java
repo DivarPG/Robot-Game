@@ -2,17 +2,14 @@ package game.ui.cell;
 
 import game.model.field.core.Direction;
 import game.model.field.core.Robot;
-import game.ui.cell.CellWidget.Layer;
-import game.ui.utils.GameWidgetsUtils;
-import game.ui.utils.ImageUtils;
-
-import javax.imageio.ImageIO;
+import game.ui.utils.ChargeColorResolver;
+import game.ui.resource.image.ImageResource;
+import game.ui.utils.ImageScaler;
+import game.ui.resource.ResourceProvider;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Виджет робота.
@@ -27,40 +24,40 @@ public class RobotWidget extends CellItemWidget {
     private final Robot robot;
 
     /**
-     * Цвет.
+     * Размер элемента.
      */
-    private final Color color;
+    private static final Dimension SIZE = new Dimension(120, 120);
+
 
     /**
      * Конструтор.
      *
      * @param robot робот.
-     * @param color цвет.
      */
-    public RobotWidget(Robot robot, Color color) {
-        super();
+    public RobotWidget(Robot robot, ResourceProvider<BufferedImage,ImageResource> imageProvider) {
+        super(imageProvider);
         this.robot = robot;
-        this.color = color;
+
+        setMouseTransparent(false);
+
         setFocusable(true);
         addKeyListener(new KeyController());
+
+//        setOpaque(true);
+//        setBackground(Color.BLACK);
     }
 
     @Override
-    protected BufferedImage getImage() {
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(getImageFile());
-            image = ImageUtils.resizeImage(image, 60, 96);
-            image = robotImageWithChargeText(image);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return image;
+    public BufferedImage getImage( ResourceProvider<BufferedImage,ImageResource> provider) {
+
+        BufferedImage original = provider.get(getImageType());
+
+        return ImageScaler.resize(original, 110, 110);
     }
 
     @Override
-    public Layer getLayer() {
-        return CellWidget.Layer.BOTTOM;
+    public ImageResource getImageType() {
+        return ImageResource.ROBOT;
     }
 
     /**
@@ -76,36 +73,7 @@ public class RobotWidget extends CellItemWidget {
 
     @Override
     protected Dimension getDimension() {
-        return new Dimension(60, 120);
-    }
-
-    /**
-     * Получить цвет робота {@link RobotWidget#color}.
-     *
-     * @return цвет робота.
-     */
-    public Color getColor() {
-        return color;
-    }
-
-    /**
-     * Получить изображение с текстом заряда.
-     *
-     * @param robotImage изображение робота.
-     * @return изображение с текстом заряда.
-     */
-    private BufferedImage robotImageWithChargeText(BufferedImage robotImage) {
-        BufferedImage img = new BufferedImage(robotImage.getWidth(), 120, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = img.getGraphics();
-        g.drawImage(robotImage, 0, 0, null);
-
-        if (cellItemState == State.DEFAULT) {
-            g.setFont(new Font("Arial", Font.PLAIN, 20));
-            g.setColor(robotChargeTextColor());
-            g.drawString(robotChargeText(), 5, 112);
-        }
-
-        return img;
+        return SIZE;
     }
 
     /**
@@ -114,7 +82,8 @@ public class RobotWidget extends CellItemWidget {
      * @return текст заряда робота.
      */
     private String robotChargeText() {
-        return robot.getCharge() + "/" + robot.getChargeCapacity();
+//        return robot.getCharge() + "/" + robot.getChargeCapacity();
+        return String.valueOf(robot.getCharge());
     }
 
     /**
@@ -123,32 +92,42 @@ public class RobotWidget extends CellItemWidget {
      * @return цвет текста заряда.
      */
     private Color robotChargeTextColor() {
-        return GameWidgetsUtils.chargeTextColor(robot.getCharge(), robot.getChargeCapacity());
+        return ChargeColorResolver.resolve(robot.getCharge(),robot.getChargeCapacity());
     }
 
-    /**
-     * Получить файл изображения робота.
-     *
-     * @return файл изображения робота.
-     */
-    private File getImageFile() {
-        File file = null;
+    @Override
+    public int getZIndex() {
+        return 100;
+    }
 
-        if (color == Color.BLUE) {
-            file = new File(ImageUtils.IMAGE_PATH + "robot_unfrozen.png");
-        }
+    @Override
+    protected void drawOverlay(Graphics g) {
 
-        return file;
+        Graphics2D g2 = (Graphics2D) g;
+
+        g2.setFont(new Font("Arial", Font.BOLD, 20));
+
+        String text = robotChargeText();
+
+        FontMetrics metrics = g2.getFontMetrics();
+
+        int x = (getWidth() - metrics.stringWidth(text)) / 2;
+        int y = getHeight() / 2;
+
+        g2.setColor(robotChargeTextColor());
+
+        g2.drawString(text, x, y+5);
+    }
+
+    @Override
+    public CellLayout.Zone getZone() {
+        return CellLayout.Zone.PRIMARY;
     }
 
     /**
      * Внутренний класс-обработчик событий. Придает специфическое поведение виджету.
      */
-    private class KeyController implements KeyListener {
-
-        @Override
-        public void keyTyped(KeyEvent arg0) {
-        }
+    private class KeyController extends KeyAdapter {
 
         @Override
         public void keyPressed(KeyEvent ke) {
@@ -160,12 +139,8 @@ public class RobotWidget extends CellItemWidget {
             repaint();
         }
 
-        @Override
-        public void keyReleased(KeyEvent arg0) {
-        }
-
         private void changeBatteryAction(int keyCode) {
-            if (keyCode == KeyEvent.VK_G) {
+            if (keyCode == KeyEvent.VK_F) {
                 boolean success = robot.changeBattery();
                 if (!success) System.out.println("Can't take battery");
             }
@@ -177,6 +152,7 @@ public class RobotWidget extends CellItemWidget {
                 System.out.println("Go to " + direction);
                 boolean success = robot.move(direction);
                 if (!success) System.out.println("Can't move " + direction);
+
             }
         }
 

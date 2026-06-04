@@ -53,6 +53,18 @@ public class SmallLabyrinth extends Labyrinth {
                 new AbstractMap.SimpleEntry<>(field.getCell(new Point(2, 2)), Direction.EAST)
         );
 
+
+        map.put(
+                new WallSegment(),
+                new AbstractMap.SimpleEntry<>(field.getCell(new Point(2, 1)), Direction.EAST)
+        );
+
+        map.put(
+                new WallSegment(),
+                new AbstractMap.SimpleEntry<>(field.getCell(new Point(2, 0)), Direction.WEST)
+        );
+
+
         return map;
     }
 
@@ -81,6 +93,11 @@ public class SmallLabyrinth extends Labyrinth {
         map.put(
                 new Battery(0),
                 field.getCell(new Point(1, 3))
+        );
+
+        map.put(
+                new Battery(5),
+                field.getCell(new Point(2, 3))
         );
 
         return map;
