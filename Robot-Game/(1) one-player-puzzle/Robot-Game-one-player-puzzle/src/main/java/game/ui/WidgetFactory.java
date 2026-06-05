@@ -99,18 +99,11 @@ public class WidgetFactory {
     public BetweenCellsWidget create(@NotNull BetweenCellsArea betweenCellsArea) {
         if (betweenCellsAreas.containsKey(betweenCellsArea)) return betweenCellsAreas.get(betweenCellsArea);
 
-        BetweenCellsWidget createdWidget = new BetweenCellsWidget(betweenCellsArea, imageResourceProvider);
+        BetweenCellsWidget createdWidget = new BetweenCellsWidget(betweenCellsArea);
 
-//        if (betweenCellsArea.getObstacle() != null) {
-//            buildWall(betweenCellsArea, createdWidget);
-//        }
-
+        // не оч !!!
         if (betweenCellsArea.getObstacle() != null) {
-            wallBuilder.build(
-                    betweenCellsArea,
-                    createdWidget,
-                    this
-            );
+            wallBuilder.build(betweenCellsArea, createdWidget, this);
         }
 
         betweenCellsAreas.put(betweenCellsArea, createdWidget);

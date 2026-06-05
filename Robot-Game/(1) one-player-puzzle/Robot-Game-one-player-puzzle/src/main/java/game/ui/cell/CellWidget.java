@@ -15,6 +15,8 @@ import java.util.List;
 
 public class CellWidget extends JPanel {
 
+
+    // не оч!!! - добавить валлидацию по списку
     List<CellItemWidget> items = new ArrayList<>();
 
     /**
@@ -31,13 +33,9 @@ public class CellWidget extends JPanel {
         setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
         setBackground(Color.decode("#888888"));
 
-
-
         setLayout(new CellLayout());
 
-
         setOpaque(true);
-
     }
 
 
@@ -67,6 +65,8 @@ public class CellWidget extends JPanel {
         if (!(item instanceof Placeable placeable)) {
             throw new IllegalArgumentException("ЗАБЫЛА ПЛЕСАБЛЕ");
         }
+
+        //items.add(item);
 
         add(item, placeable.getZone());
 
@@ -124,7 +124,7 @@ public class CellWidget extends JPanel {
 
     public void removeItem(CellItemWidget item) {
 
-       // items.remove(item);
+        //items.remove(item);
 
         remove(item);
 

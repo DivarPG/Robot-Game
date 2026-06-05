@@ -28,6 +28,7 @@ public class RobotWidget extends CellItemWidget {
      */
     private static final Dimension SIZE = new Dimension(120, 120);
 
+    private final  ResourceProvider<BufferedImage,ImageResource> imageProvider;
 
     /**
      * Конструтор.
@@ -35,9 +36,10 @@ public class RobotWidget extends CellItemWidget {
      * @param robot робот.
      */
     public RobotWidget(Robot robot, ResourceProvider<BufferedImage,ImageResource> imageProvider) {
-        super(imageProvider);
+        super();
         this.robot = robot;
 
+        this.imageProvider = imageProvider;
         setMouseTransparent(false);
 
         setFocusable(true);
@@ -47,16 +49,38 @@ public class RobotWidget extends CellItemWidget {
 //        setBackground(Color.BLACK);
     }
 
-    @Override
-    public BufferedImage getImage( ResourceProvider<BufferedImage,ImageResource> provider) {
 
-        BufferedImage original = provider.get(getImageType());
-
+    private BufferedImage getImage( ) {
+        BufferedImage original = imageProvider.get(getImageType());
         return ImageScaler.resize(original, 110, 110);
     }
 
     @Override
-    public ImageResource getImageType() {
+    protected void draw(Graphics g) {
+
+        BufferedImage img = getImage();
+
+
+        int cw = getWidth();
+        int ch = getHeight();
+
+        int iw = img.getWidth();
+        int ih = img.getHeight();
+
+        int x = (cw - iw) / 2;
+        int y = (ch - ih) / 2;
+
+        g.drawImage(
+                img,
+                x,
+                y,
+                iw,
+                ih,
+                null
+        );
+    }
+
+    private ImageResource getImageType() {
         return ImageResource.ROBOT;
     }
 

@@ -13,18 +13,37 @@ import java.awt.image.BufferedImage;
  *
  * @see ExitPoint
  */
+
 public class ExitWidget extends CellItemWidget {
 
-    private final ResourceProvider<ImageIcon, GifResource> provider;
+    // лучше хранить через провайдера или через ресурс ?
+    private final ImageIcon gif;
 
-    public ExitWidget(ResourceProvider<ImageIcon, GifResource> provider) {
+    public ExitWidget(
+            ResourceProvider<ImageIcon, GifResource> provider) {
 
-        super(null);
+        this.gif = provider.get(GifResource.PORTAL);
 
-        this.provider = provider;
+        new Timer(40, e -> repaint()).start();
+    }
 
-        setLayout(new BorderLayout());
-        add(createContent(), BorderLayout.CENTER);
+    @Override
+    protected void draw(Graphics g) {
+
+        int width = 100;
+        int height = 100;
+
+        int x = (getWidth() - width) / 2;
+        int y = (getHeight() - height) / 2;
+
+        g.drawImage(
+                gif.getImage(),
+                x,
+                y,
+                width,
+                height,
+                this
+        );
     }
 
     @Override
@@ -40,52 +59,5 @@ public class ExitWidget extends CellItemWidget {
     @Override
     public int getZIndex() {
         return 50;
-    }
-
-    @Override
-    protected JComponent createContent() {
-
-        ImageIcon gif = provider.get(GifResource.PORTAL);
-
-        JComponent component = new JComponent() {
-
-            {
-                setOpaque(false);
-
-                new Timer(40, e -> repaint()).start();
-            }
-
-            @Override
-            protected void paintComponent(Graphics g) {
-
-                super.paintComponent(g);
-
-                g.drawImage(
-                        gif.getImage(),
-                        0,
-                        0,
-                        getWidth(),
-                        getHeight(),
-                        this
-                );
-            }
-
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(100, 100);
-            }
-        };
-
-        return component;
-    }
-
-    @Override
-    public ImageResource getImageType() {
-        return null;
-    }
-
-    @Override
-    public BufferedImage getImage(ResourceProvider<BufferedImage, ImageResource> provider) {
-        return null;
     }
 }

@@ -1,6 +1,7 @@
 package game.ui.resource.audio;
 
 import game.ui.resource.ResourceProvider;
+import org.jetbrains.annotations.NotNull;
 
 import javax.sound.sampled.*;
 import java.net.URL;
@@ -14,10 +15,7 @@ public class ClasspathSoundResourceProvider implements ResourceProvider<Clip, So
 //    public Clip get(@NotNull SoundResource res) {
 //
 //        try {
-//            AudioInputStream stream =
-//                    AudioSystem.getAudioInputStream(
-//                            new File(ROOT + res.getPath())
-//                    );
+//            AudioInputStream stream = AudioSystem.getAudioInputStream(new File(ROOT + res.getPath()));
 //
 //            Clip clip = AudioSystem.getClip();
 //            clip.open(stream);
@@ -30,7 +28,7 @@ public class ClasspathSoundResourceProvider implements ResourceProvider<Clip, So
 //    }
 
     @Override
-    public Clip get(SoundResource res) {
+    public Clip get(@NotNull SoundResource res) {
 
         try {
 

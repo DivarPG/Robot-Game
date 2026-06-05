@@ -14,7 +14,6 @@ import game.model.events.RobotActionEvent;
 import game.model.events.RobotActionListener;
 import game.ui.obstacle.BetweenCellsWidget;
 import game.ui.cell.*;
-
 import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +24,8 @@ public class FieldWidget extends JPanel {
     private final WidgetFactory widgetFactory;
     private final ResourceProvider<Clip, SoundResource> soundResourceProvider = new CachedResourceProvider<>(new ClasspathSoundResourceProvider());
 
+
+    // не оч !!!
     protected void playSound(SoundResource sound) {
         Clip clip = soundResourceProvider.get(sound);
 
@@ -100,7 +101,7 @@ public class FieldWidget extends JPanel {
 
             eastCellWidget.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-            //ТОЧКА ГОВНА
+            //ТОЧКА ПРОБЛЕМ
             row.add(eastCellWidget);
 
         }

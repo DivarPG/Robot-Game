@@ -13,19 +13,16 @@ import java.awt.image.BufferedImage;
 
 public class WallPieceWidget extends CellItemWidget{
 
-    private final CellWidget cell;
     private final Direction direction;
 
     private static final Dimension HORIZONTAL = new Dimension(90, 5);
     private static final Dimension VERTICAL = new Dimension(5, 90);
 
-    public WallPieceWidget(
-            @NotNull CellWidget cell,
-            @NotNull ResourceProvider<BufferedImage, ImageResource> imageProvider,
-            @NotNull Direction direction
-    ) {
-        super(imageProvider);
-        this.cell = cell;
+    private final  ResourceProvider<BufferedImage,ImageResource> imageProvider;
+
+    public WallPieceWidget(@NotNull ResourceProvider<BufferedImage, ImageResource> imageProvider, @NotNull Direction direction) {
+        super();
+        this.imageProvider = imageProvider;
         this.direction = direction;
     }
 
@@ -48,15 +45,32 @@ public class WallPieceWidget extends CellItemWidget{
     }
 
     @Override
-    public ImageResource getImageType() {
+    protected void draw(Graphics g){
+        BufferedImage img = getImage();
+
+        int cw = getWidth();
+        int ch = getHeight();
+
+        int iw = img.getWidth();
+        int ih = img.getHeight();
+
+        int x = (cw - iw) / 2;
+        int y = (ch - ih) / 2;
+
+        g.drawImage(img, x, y, iw, ih, null);
+
+    }
+
+
+    private ImageResource getImageType() {
         return switch (direction) {
             case NORTH, SOUTH -> ImageResource.WALL_HORIZONTAL;
             case EAST, WEST   -> ImageResource.WALL_VERTICAL;
         };
     }
 
-    @Override
-    public BufferedImage getImage(ResourceProvider<BufferedImage, ImageResource> provider) {
-        return provider.get(getImageType());
+
+    private BufferedImage getImage() {
+        return imageProvider.get(getImageType());
     }
 }

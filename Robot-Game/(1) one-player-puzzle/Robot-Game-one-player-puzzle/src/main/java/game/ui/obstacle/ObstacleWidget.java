@@ -28,8 +28,6 @@ public abstract class ObstacleWidget extends JPanel implements WithImageResource
 
     private static final Dimension SIZE_VERTICAL = new Dimension(5, 10);
 
-
-
     private final  ResourceProvider<BufferedImage,ImageResource> provider;
 
     /**
@@ -58,7 +56,6 @@ public abstract class ObstacleWidget extends JPanel implements WithImageResource
         super.paintComponent(g);
         g.drawImage(getImage(provider), 0, 0, null);
     }
-
 
 
     /**

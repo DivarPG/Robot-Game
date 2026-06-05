@@ -29,7 +29,7 @@ public class WallBuilder {
             //гарантируем что он всегда есть
             CellWidget widget = factory.create(cell);
 
-            widget.addItem( new WallPieceWidget(widget, provider, d));
+            widget.addItem(new WallPieceWidget(provider, d));
 
             if (between.getComponentCount() == 0) {
                 between.setObstacle(new WallWidget(toOrientation(d), provider));

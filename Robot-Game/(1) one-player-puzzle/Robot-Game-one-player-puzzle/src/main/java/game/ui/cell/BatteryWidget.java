@@ -30,6 +30,8 @@ public class BatteryWidget extends CellItemWidget {
      */
     private static final Dimension SIZE = new Dimension(90, 90);
 
+    private final  ResourceProvider<BufferedImage,ImageResource> imageProvider;
+
     /**
      * Конструктор.
      *
@@ -37,9 +39,10 @@ public class BatteryWidget extends CellItemWidget {
      */
     public BatteryWidget(@NotNull Battery battery, @NotNull ResourceProvider<BufferedImage, ImageResource> imageProvider) {
 
-        super(imageProvider);
+        super();
 
         this.battery = battery;
+        this.imageProvider = imageProvider;
 
         setMouseTransparent(true);
 
@@ -52,19 +55,15 @@ public class BatteryWidget extends CellItemWidget {
         return 10;
     }
 
-    @Override
-    public BufferedImage getImage(@NotNull ResourceProvider<BufferedImage,ImageResource> provider) {
 
-        BufferedImage original = provider.get(getImageType());
-
+    public BufferedImage getImage() {
+        BufferedImage original = imageProvider.get(getImageType());
         return ImageScaler.resize(original,120,100);
     }
 
-    @Override
+
     public ImageResource getImageType() {
-        double percent =
-                (double) battery.getCharge()
-                        / battery.getCapacity();
+        double percent = (double) battery.getCharge() / battery.getCapacity();
 
         if (percent > 0.66) {
             return ImageResource.BATTERY_FULL;
@@ -75,6 +74,31 @@ public class BatteryWidget extends CellItemWidget {
         }
 
         return ImageResource.BATTERY_LOW;
+    }
+
+    @Override
+    protected void draw(Graphics g) {
+
+        BufferedImage img = getImage();
+
+
+        int cw = getWidth();
+        int ch = getHeight();
+
+        int iw = img.getWidth();
+        int ih = img.getHeight();
+
+        int x = (cw - iw) / 2;
+        int y = (ch - ih) / 2;
+
+        g.drawImage(
+                img,
+                x,
+                y,
+                iw,
+                ih,
+                null
+        );
     }
 
     /**
