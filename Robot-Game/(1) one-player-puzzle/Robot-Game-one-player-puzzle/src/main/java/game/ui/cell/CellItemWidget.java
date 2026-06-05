@@ -75,9 +75,7 @@ public abstract class CellItemWidget extends JPanel implements Placeable {
         }
     }
 
-    protected void draw(Graphics g){
-
-    }
+    protected abstract void draw(Graphics g);
 
 
     // если не абстрактный то пустой хз - иначе делать всем текст зачем

@@ -3,7 +3,6 @@ package game.ui.obstacle;
 import game.model.field.core.Orientation;
 import game.ui.resource.image.ImageResource;
 import game.ui.resource.ResourceProvider;
-import game.ui.resource.image.WithImageResource;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +12,7 @@ import java.awt.image.BufferedImage;
 /**
  * Виджет препятствия, расположенного между ячейками.
  */
-public abstract class ObstacleWidget extends JPanel implements WithImageResource {
+public abstract class ObstacleWidget extends JPanel {
 
     /**
      * Ориентация.
@@ -27,8 +26,6 @@ public abstract class ObstacleWidget extends JPanel implements WithImageResource
     private static final Dimension SIZE_HORIZONTAL = new Dimension(10, 5);
 
     private static final Dimension SIZE_VERTICAL = new Dimension(5, 10);
-
-    private final  ResourceProvider<BufferedImage,ImageResource> provider;
 
     /**
      * Получить ориентацию {@link ObstacleWidget#orientation}.
@@ -44,18 +41,29 @@ public abstract class ObstacleWidget extends JPanel implements WithImageResource
      *
      * @param orientation ориентация.
      */
-    public ObstacleWidget(Orientation orientation,  ResourceProvider<BufferedImage, ImageResource> provider) {
+    public ObstacleWidget(Orientation orientation) {
         this.orientation = orientation;
-        this.provider = provider;
+
         setPreferredSize(getDimensionByOrientation());
         setOpaque(false);
     }
 
+//    @Override
+//    protected void paintComponent(Graphics g) {
+//        super.paintComponent(g);
+//        g.drawImage(getImage(provider), 0, 0, null);
+//    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(getImage(provider), 0, 0, null);
+
+        if (getComponentCount() == 0) {
+            draw(g);
+        }
     }
+
+    protected abstract void draw(Graphics g);
 
 
     /**
