@@ -5,13 +5,17 @@ import game.model.field.core.Robot;
 import game.ui.obstacle.BetweenCellsWidget;
 import game.ui.obstacle.wallcomponent.WallBuilder;
 import game.ui.resource.*;
+import game.ui.resource.audio.ClasspathSoundResourceProvider;
+import game.ui.resource.audio.SoundResource;
 import game.ui.resource.gif.ClasspathGifResourceProvider;
 import game.ui.resource.gif.GifResource;
 import game.ui.resource.image.ClasspathImageResourceProvider;
 import game.ui.resource.image.ImageResource;
+import game.ui.utils.SoundPlayer;
 import org.jetbrains.annotations.NotNull;
 import game.ui.cell.*;
 
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -23,11 +27,19 @@ public class WidgetFactory {
     private final Map<CellObject, CellItemWidget> cellObjects = new HashMap<>();
     private final Map<BetweenCellsArea, BetweenCellsWidget> betweenCellsAreas = new HashMap<>();
 
+
+    // не оч!!! состояния и предресурсы бы создавать и распределять не здесь
+
     private final ResourceProvider<BufferedImage, ImageResource> imageResourceProvider =
             new CachedResourceProvider<>(new ClasspathImageResourceProvider());
 
     private final ResourceProvider<ImageIcon, GifResource> gifResourceProvider =
             new CachedResourceProvider<>(new ClasspathGifResourceProvider());
+
+    private final ResourceProvider<Clip, SoundResource> soundResourceProvider =
+            new ClasspathSoundResourceProvider();
+
+    private final SoundPlayer soundPlayer = new  SoundPlayer(soundResourceProvider);
 
     private final WallBuilder wallBuilder = new WallBuilder(imageResourceProvider);
 
@@ -74,11 +86,11 @@ public class WidgetFactory {
 
         CellItemWidget createdWidget = null;
         if (cellObject instanceof Robot) {
-            createdWidget = new RobotWidget((Robot) cellObject, imageResourceProvider);
+            createdWidget = new RobotWidget((Robot) cellObject, imageResourceProvider, soundPlayer);
         } else if (cellObject instanceof Battery) {
             createdWidget = new BatteryWidget((Battery) cellObject, imageResourceProvider);
         } else if (cellObject instanceof ExitPoint) {
-            createdWidget = new ExitWidget(gifResourceProvider);
+            createdWidget = new ExitWidget((ExitPoint)cellObject,gifResourceProvider, soundPlayer);
         } else {
             throw new IllegalArgumentException();
         }

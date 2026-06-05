@@ -1,8 +1,14 @@
 package game.ui.cell;
 
+import game.model.events.ExitPointActionEvent;
+import game.model.events.ExitPointActionListener;
 import game.model.field.core.ExitPoint;
 import game.ui.resource.ResourceProvider;
+import game.ui.resource.audio.SoundResource;
 import game.ui.resource.gif.GifResource;
+import game.ui.utils.SoundPlayer;
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -17,12 +23,19 @@ public class ExitWidget extends CellItemWidget {
     // лучше хранить через провайдера или через ресурс ?
     private final ImageIcon gif;
 
-    public ExitWidget(
-            ResourceProvider<ImageIcon, GifResource> provider) {
+    public ExitWidget( ExitPoint exitPoint,
+            ResourceProvider<ImageIcon, GifResource> provider, SoundPlayer soundPlayer ){
 
         this.gif = provider.get(GifResource.PORTAL);
 
         new Timer(40, e -> repaint()).start();
+
+        exitPoint.addExitPointActionListener(new ExitPointActionListener() {
+            @Override
+            public void robotIsTeleported(@NotNull ExitPointActionEvent event) {
+                soundPlayer.playSound(SoundResource.TELEPORT);
+            }
+        });
     }
 
     @Override

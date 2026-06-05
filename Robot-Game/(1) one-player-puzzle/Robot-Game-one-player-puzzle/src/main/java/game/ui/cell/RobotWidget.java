@@ -9,9 +9,8 @@ import game.ui.utils.ChargeColorResolver;
 import game.ui.resource.image.ImageResource;
 import game.ui.utils.ImageScaler;
 import game.ui.resource.ResourceProvider;
-import game.ui.utils.SoundActivator;
+import game.ui.utils.SoundPlayer;
 import org.jetbrains.annotations.NotNull;
-
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -41,7 +40,7 @@ public class RobotWidget extends CellItemWidget {
      *
      * @param robot робот.
      */
-    public RobotWidget(Robot robot, ResourceProvider<BufferedImage,ImageResource> imageProvider) {
+    public RobotWidget(Robot robot, ResourceProvider<BufferedImage,ImageResource> imageProvider, SoundPlayer soundPlayer) {
         super();
         this.robot = robot;
 
@@ -51,12 +50,12 @@ public class RobotWidget extends CellItemWidget {
         robot.addRobotActionListener(new RobotActionListener() {
             @Override
             public void robotIsMoved(@NotNull RobotActionEvent event) {
-                SoundActivator.playSound(SoundResource.MOVE);
+                soundPlayer.playSound(SoundResource.MOVE);
             }
 
             @Override
             public void robotChangedBattery(@NotNull RobotActionEvent event) {
-                SoundActivator.playSound(SoundResource.PICK_BATTERY);
+                soundPlayer.playSound(SoundResource.PICK_BATTERY);
             }
 
         });

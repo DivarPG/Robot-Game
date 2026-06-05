@@ -65,7 +65,7 @@ public class CellLayout implements LayoutManager2 {
     }
 
 
-    private static final int BORDER = 5;
+    private static final int BORDER = 3;
 
     private Rectangle getBounds(Zone zone, int w, int h) {
 
