@@ -2,7 +2,6 @@ package game.ui.resource.audio;
 
 import game.ui.resource.ResourceProvider;
 import org.jetbrains.annotations.NotNull;
-
 import javax.sound.sampled.*;
 import java.net.URL;
 import java.util.Objects;

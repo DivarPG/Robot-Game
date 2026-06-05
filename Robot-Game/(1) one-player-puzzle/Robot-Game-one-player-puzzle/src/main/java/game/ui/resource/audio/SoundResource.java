@@ -1,7 +1,6 @@
 package game.ui.resource.audio;
 
 import game.ui.resource.ResourceDescriptor;
-import org.jetbrains.annotations.NotNull;
 
 public enum SoundResource  implements ResourceDescriptor {
     MOVE("robot_move.wav"),

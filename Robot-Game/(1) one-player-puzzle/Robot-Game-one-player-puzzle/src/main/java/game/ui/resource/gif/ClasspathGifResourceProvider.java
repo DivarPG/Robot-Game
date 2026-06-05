@@ -2,7 +2,6 @@ package game.ui.resource.gif;
 
 import game.ui.resource.ResourceProvider;
 import org.jetbrains.annotations.NotNull;
-
 import javax.swing.*;
 import java.net.URL;
 import java.util.Objects;

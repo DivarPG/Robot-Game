@@ -3,7 +3,6 @@ package game.ui.obstacle.wallcomponent;
 import game.model.field.core.Direction;
 import game.ui.cell.CellItemWidget;
 import game.ui.cell.CellLayout;
-import game.ui.cell.CellWidget;
 import game.ui.resource.ResourceProvider;
 import game.ui.resource.image.ImageResource;
 import org.jetbrains.annotations.NotNull;

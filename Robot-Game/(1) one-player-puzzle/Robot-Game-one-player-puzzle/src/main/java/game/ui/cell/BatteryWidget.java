@@ -2,13 +2,10 @@ package game.ui.cell;
 
 import game.model.field.core.Battery;
 import game.ui.resource.*;
-import game.ui.resource.audio.SoundResource;
 import game.ui.resource.image.ImageResource;
 import game.ui.utils.ChargeColorResolver;
 import game.ui.utils.ImageScaler;
 import org.jetbrains.annotations.NotNull;
-
-import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;

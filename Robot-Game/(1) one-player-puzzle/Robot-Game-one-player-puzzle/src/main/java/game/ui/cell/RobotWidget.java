@@ -1,11 +1,17 @@
 package game.ui.cell;
 
+import game.model.events.RobotActionEvent;
+import game.model.events.RobotActionListener;
 import game.model.field.core.Direction;
 import game.model.field.core.Robot;
+import game.ui.resource.audio.SoundResource;
 import game.ui.utils.ChargeColorResolver;
 import game.ui.resource.image.ImageResource;
 import game.ui.utils.ImageScaler;
 import game.ui.resource.ResourceProvider;
+import game.ui.utils.SoundActivator;
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -41,6 +47,19 @@ public class RobotWidget extends CellItemWidget {
 
         this.imageProvider = imageProvider;
         setMouseTransparent(false);
+
+        robot.addRobotActionListener(new RobotActionListener() {
+            @Override
+            public void robotIsMoved(@NotNull RobotActionEvent event) {
+                SoundActivator.playSound(SoundResource.MOVE);
+            }
+
+            @Override
+            public void robotChangedBattery(@NotNull RobotActionEvent event) {
+                SoundActivator.playSound(SoundResource.PICK_BATTERY);
+            }
+
+        });
 
         setFocusable(true);
         addKeyListener(new KeyController());

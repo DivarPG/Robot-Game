@@ -4,7 +4,6 @@ import game.model.field.core.Orientation;
 import game.ui.obstacle.ObstacleWidget;
 import game.ui.resource.image.ImageResource;
 import game.ui.resource.ResourceProvider;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 

@@ -1,10 +1,6 @@
 package game.ui.resource.image;
 
-
 import game.ui.resource.ResourceDescriptor;
-import org.jetbrains.annotations.NotNull;
-
-import javax.lang.model.element.ModuleElement;
 
 /**
 * Список типизированных расположений изображений

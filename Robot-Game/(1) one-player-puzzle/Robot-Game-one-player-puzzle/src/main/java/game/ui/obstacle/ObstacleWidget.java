@@ -1,12 +1,9 @@
 package game.ui.obstacle;
 
 import game.model.field.core.Orientation;
-import game.ui.resource.image.ImageResource;
-import game.ui.resource.ResourceProvider;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
+
 
 
 /**

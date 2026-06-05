@@ -3,10 +3,8 @@ package game.ui.cell;
 import game.model.field.core.ExitPoint;
 import game.ui.resource.ResourceProvider;
 import game.ui.resource.gif.GifResource;
-import game.ui.resource.image.ImageResource;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
 /**
  * Виджет ячейки выхода.

@@ -1,5 +1,6 @@
 package game.ui;
 
+import game.model.events.*;
 import game.model.field.core.*;
 import game.model.field.core.Point;
 import game.model.field.core.Robot;
@@ -8,10 +9,6 @@ import game.ui.resource.ResourceProvider;
 import game.ui.resource.audio.ClasspathSoundResourceProvider;
 import game.ui.resource.audio.SoundResource;
 import org.jetbrains.annotations.NotNull;
-import game.model.events.FieldActionEvent;
-import game.model.events.FieldActionListener;
-import game.model.events.RobotActionEvent;
-import game.model.events.RobotActionListener;
 import game.ui.obstacle.BetweenCellsWidget;
 import game.ui.cell.*;
 import javax.sound.sampled.Clip;
@@ -22,17 +19,6 @@ public class FieldWidget extends JPanel {
 
     private final Field field;
     private final WidgetFactory widgetFactory;
-    private final ResourceProvider<Clip, SoundResource> soundResourceProvider = new CachedResourceProvider<>(new ClasspathSoundResourceProvider());
-
-
-    // не оч !!!
-    protected void playSound(SoundResource sound) {
-        Clip clip = soundResourceProvider.get(sound);
-
-        clip.stop();
-        clip.setFramePosition(0);
-        clip.start();
-    }
 
     public FieldWidget(@NotNull Field field, @NotNull  WidgetFactory widgetFactory) {
         this.field = field;
@@ -147,7 +133,6 @@ public class FieldWidget extends JPanel {
                 to.addItem(robotWidget);
             }
             robotWidget.requestFocus();
-            playSound(SoundResource.MOVE);
         }
 
         @Override
@@ -157,7 +142,6 @@ public class FieldWidget extends JPanel {
             CellItemWidget batteryWidget = widgetFactory.getWidget(event.getBattery());
             cellWidget.removeItem(batteryWidget);
             widgetFactory.remove(event.getBattery());
-            playSound(SoundResource.PICK_BATTERY);
         }
     }
 
@@ -170,7 +154,7 @@ public class FieldWidget extends JPanel {
             CellWidget teleportWidget = widgetFactory.getWidget(teleport);
             CellItemWidget robotWidget = widgetFactory.getWidget(robot);
             teleportWidget.removeItem(robotWidget);
-            playSound(SoundResource.TELEPORT);
         }
     }
+
 }

@@ -2,7 +2,6 @@ package game.ui.resource.image;
 
 import game.ui.resource.ResourceProvider;
 import org.jetbrains.annotations.NotNull;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;

@@ -16,7 +16,6 @@ import java.util.Map;
 //         *  стенная
 // *  - зона для компонентов межкклеточных элементов (стены)
 
-
 public class CellLayout implements LayoutManager2 {
 
     public enum Zone {
