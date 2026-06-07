@@ -1,91 +1,55 @@
 package game.ui.cell;
 
-import game.ui.utils.ImageUtils;
+import game.ui.resource.ResourceProvider;
+import game.ui.resource.gif.GifResource;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class HoleWidget extends CellItemWidget {
 
-    private BufferedImage staticImage;
-    private List<BufferedImage> gifFrames;
-    private int currentFrame = 0;
-    private boolean showGif = true;
-    private Timer frameTimer;
+    private static final Dimension SIZE = new Dimension(120, 120);
 
-    public HoleWidget() {
-        try {
-            // Load the static image
-            staticImage = ImageIO.read(new File(ImageUtils.IMAGE_PATH + "hole.png"));
-            staticImage = ImageUtils.resizeImage(staticImage, 120, 120);
+    private final ImageIcon gif;
 
-            gifFrames = extractGifFrames(new File(ImageUtils.IMAGE_PATH + "digging.gif"));
+    public HoleWidget(ResourceProvider<ImageIcon, GifResource> provider) {
 
-            frameTimer = new Timer(20, e -> {
-                if (showGif && gifFrames != null && !gifFrames.isEmpty()) {
-                    if (currentFrame < gifFrames.size() - 1) {
-                        currentFrame++;
-                    } else {
-                        frameTimer.stop();
-                    }
-                    repaint();
-                }
-            });
-            frameTimer.start();
+        this.gif = provider.get(GifResource.DIGGING);
 
-            new Timer(2500, e -> {
-                showGif = false;
-                repaint();
-                ((Timer) e.getSource()).stop();
-                frameTimer.stop();
-            }).start();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private List<BufferedImage> extractGifFrames(File gifFile) throws IOException {
-        List<BufferedImage> frames = new ArrayList<>();
-        ImageInputStream inputStream = ImageIO.createImageInputStream(gifFile);
-        ImageReader reader = ImageIO.getImageReadersByFormatName("gif").next();
-        reader.setInput(inputStream);
-
-        int frameCount = reader.getNumImages(true);
-        for (int i = 0; i < frameCount; i++) {
-            BufferedImage frame = reader.read(i);
-            frames.add(ImageUtils.resizeImage(frame, 120, 120));
-        }
-
-        reader.dispose();
-        inputStream.close();
-        return frames;
+        new Timer(40, e -> repaint()).start();
     }
 
     @Override
-    protected BufferedImage getImage() {
-        if (showGif && gifFrames != null && !gifFrames.isEmpty()) {
-            return gifFrames.get(currentFrame);
-        } else {
-            return staticImage;
-        }
-    }
+    protected void draw(Graphics g) {
 
-    @Override
-    public CellWidget.Layer getLayer() {
-        return CellWidget.Layer.TOP;
+        int width = 120;
+        int height = 120;
+
+        int x = (getWidth() - width) / 2;
+        int y = (getHeight() - height) / 2;
+
+        g.drawImage(
+                gif.getImage(),
+                x,
+                y,
+                width,
+                height,
+                this
+        );
     }
 
     @Override
     protected Dimension getDimension() {
-        return new Dimension(120, 120);
+        return SIZE;
+    }
+
+    @Override
+    public CellLayout.Zone getZone() {
+        return CellLayout.Zone.PRIMARY;
+    }
+
+    @Override
+    public int getZIndex() {
+        return 120;
     }
 }

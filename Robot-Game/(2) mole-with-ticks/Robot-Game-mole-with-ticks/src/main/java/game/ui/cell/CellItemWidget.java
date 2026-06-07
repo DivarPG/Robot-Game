@@ -1,78 +1,40 @@
 package game.ui.cell;
 
-import game.ui.cell.CellWidget.Layer;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
+
 
 /**
  * Виджет объекта для виджета ячейки.
  */
-public abstract class CellItemWidget extends JPanel {
+public abstract class CellItemWidget extends JPanel implements Placeable {
+
+    private boolean mouseTransparent = false;
+
+    //private final  ResourceProvider<BufferedImage,ImageResource> imageProvider;
+
+    protected void setMouseTransparent(boolean state) {
+        mouseTransparent = state;
+    }
+
+    @Override
+    public boolean contains(int x, int y) {
+
+        if (mouseTransparent) {
+            return false;
+        }
+
+        return super.contains(x, y);
+    }
 
     /**
      * Конструктор.
      */
     public CellItemWidget() {
-        setState(State.DEFAULT);
+        //this.imageProvider = imageProvider;
         setOpaque(false);
     }
 
-    /**
-     * Состояние виджета.
-     */
-    public enum State {
-        /**
-         * Обычный.
-         */
-        DEFAULT,
-
-        /**
-         * Маленький.
-         */
-        SMALL
-    }
-
-    /**
-     * Состояние виджета.
-     */
-    protected State cellItemState = State.DEFAULT;
-
-    /**
-     * Установить состояние виджета {@link CellItemWidget#cellItemState}
-     *
-     * @param state состояние виджета.
-     */
-    void setState(State state) {
-        cellItemState = state;
-        setPreferredSize(getDimension());
-        repaint();
-        revalidate();
-    }
-
-    /**
-     * Получить состояние виджета {@link CellItemWidget#cellItemState}.
-     *
-     * @return состояние виджета.
-     */
-    public State getState() {
-        return cellItemState;
-    }
-
-    /**
-     * Получить изображение виджета.
-     *
-     * @return изображение виджета.
-     */
-    protected abstract BufferedImage getImage();
-
-    /**
-     * Получить слой на котором располагается виджет.
-     *
-     * @return слой на котором располагается виджет.
-     */
-    public abstract Layer getLayer();
 
     /**
      * Получить размеры виджета.
@@ -81,9 +43,47 @@ public abstract class CellItemWidget extends JPanel {
      */
     protected abstract Dimension getDimension();
 
+//    protected void drawImage(Graphics g) {
+//
+//        BufferedImage img = getImage(imageProvider);
+//
+//        int cw = getWidth();
+//        int ch = getHeight();
+//
+//        int iw = img.getWidth();
+//        int ih = img.getHeight();
+//
+//        int x = (cw - iw) / 2;
+//        int y = (ch - ih) / 2;
+//
+//        g.drawImage(
+//                  img,
+//                  x,
+//                  y,
+//                  iw,
+//                  ih,
+//                  null);
+//    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(getImage(), 0, 0, null);
+
+        if (getComponentCount() == 0) {
+            draw(g);
+            drawOverlay(g);
+        }
+    }
+
+    protected abstract void draw(Graphics g);
+
+
+    // если не абстрактный то пустой хз - иначе делать всем текст зачем
+    protected void drawOverlay(Graphics g){
+
+    }
+
+    public int getZIndex() {
+        return 0;
     }
 }

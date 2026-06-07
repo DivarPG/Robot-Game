@@ -105,9 +105,7 @@ public class Main {
                     String message = "";
                     switch (status) {
                         case WIN:
-                            message = "Выиграл робот: " + GameWidgetsUtils.colorName(
-                                    ((RobotWidget) widgetFactory.getWidget(game.getRobot())).getColor()
-                            );
+                            message = "Вы выиграли";
                             break;
                         case GAME_ABORTED:
                             message = "Игра завершена досрочно";

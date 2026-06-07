@@ -20,8 +20,6 @@ public class FieldWidget extends JPanel {
     private final Field field;
     private final WidgetFactory widgetFactory;
 
-
-
     public FieldWidget(@NotNull Field field, @NotNull  WidgetFactory widgetFactory) {
         this.field = field;
         this.widgetFactory = widgetFactory;

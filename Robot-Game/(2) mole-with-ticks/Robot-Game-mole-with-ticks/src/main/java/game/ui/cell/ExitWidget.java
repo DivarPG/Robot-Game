@@ -1,40 +1,74 @@
 package game.ui.cell;
 
+import game.model.events.ExitPointActionEvent;
+import game.model.events.ExitPointActionListener;
 import game.model.field.core.ExitPoint;
-import game.ui.utils.ImageUtils;
+import game.ui.resource.ResourceProvider;
+import game.ui.resource.audio.SoundResource;
+import game.ui.resource.gif.GifResource;
+import game.ui.resource.audio.SoundPlayer;
+import org.jetbrains.annotations.NotNull;
 
-import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Виджет ячейки выхода.
  *
  * @see ExitPoint
  */
+
 public class ExitWidget extends CellItemWidget {
 
-    @Override
-    protected BufferedImage getImage() {
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(new File(ImageUtils.IMAGE_PATH + "exit.png"));
-            image = ImageUtils.resizeImage(image, 120, 100);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return image;
+    // лучше хранить через провайдера или через ресурс ?
+    private final ImageIcon gif;
+
+    public ExitWidget( ExitPoint exitPoint,
+                       ResourceProvider<ImageIcon, GifResource> provider, SoundPlayer soundPlayer ){
+
+        this.gif = provider.get(GifResource.PORTAL);
+
+        new Timer(40, e -> repaint()).start();
+
+        exitPoint.addExitPointActionListener(new ExitPointActionListener() {
+            @Override
+            public void robotIsTeleported(@NotNull ExitPointActionEvent event) {
+                soundPlayer.playSound(SoundResource.TELEPORT);
+            }
+        });
     }
 
     @Override
-    public CellWidget.Layer getLayer() {
-        return CellWidget.Layer.TOP;
+    protected void draw(Graphics g) {
+
+        int width = 100;
+        int height = 100;
+
+        int x = (getWidth() - width) / 2;
+        int y = (getHeight() - height) / 2;
+
+        g.drawImage(
+                gif.getImage(),
+                x,
+                y,
+                width,
+                height,
+                this
+        );
+    }
+
+    @Override
+    public CellLayout.Zone getZone() {
+        return CellLayout.Zone.PRIMARY;
     }
 
     @Override
     protected Dimension getDimension() {
-        return new Dimension(120, 120);
+        return new Dimension(150, 150);
+    }
+
+    @Override
+    public int getZIndex() {
+        return 50;
     }
 }

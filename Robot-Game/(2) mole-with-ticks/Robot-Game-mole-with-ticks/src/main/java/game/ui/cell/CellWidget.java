@@ -1,49 +1,43 @@
 package game.ui.cell;
 
 import game.model.field.core.Cell;
-import game.ui.utils.ImageUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Виджет ячейки.
  *
  * @see Cell
  */
+
 public class CellWidget extends JPanel {
 
-    /**
-     * Слой.
-     */
-    public enum Layer {
-        /**
-         * Верхний.
-         */
-        TOP,
 
-        /**
-         * Нижний.
-         */
-        BOTTOM
-    }
-
-    private final Map<Layer, CellItemWidget> items = new HashMap<>();
+    // не оч!!! - добавить валлидацию по списку
+    List<CellItemWidget> items = new ArrayList<>();
 
     /**
      * Размер виджета ячейки.
      */
-    private static final int CELL_SIZE = 120;
+    private static final int CELL_SIZE = 150;
+
 
     /**
      * Конструктор.
      */
     public CellWidget() {
+
         setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
-        setBackground(ImageUtils.BACKGROUND_COLOR);
+        setBackground(Color.decode("#888888"));
+
+        setLayout(new CellLayout());
+
+        setOpaque(true);
     }
+
 
     /**
      * Добавить элемент в виджет ячейки.
@@ -51,24 +45,53 @@ public class CellWidget extends JPanel {
      * @param item виджет объекта для ячейки.
      * @throws IllegalArgumentException если объектов добавляется больше 2.
      */
+
+//    public void addItem(CellItemWidget item) {
+//
+//        Dimension size = item.getDimension();
+//
+//        item.setBounds(0, 0, size.width, size.height);
+//
+//        add(item, Integer.valueOf(item.getZIndex()));
+//
+//        repaint();
+//        revalidate();
+//    }
+
+
+
     public void addItem(CellItemWidget item) {
-        if (items.size() > 2) throw new IllegalArgumentException();
-        int index = -1;
 
-        if (items.containsKey(Layer.BOTTOM)) {
-            item.setState(CellItemWidget.State.SMALL);
-        } else {
-            item.setState(CellItemWidget.State.DEFAULT);
+        if (!(item instanceof Placeable placeable)) {
+            throw new IllegalArgumentException("ЗАБЫЛА ПЛЕСАБЛЕ");
         }
 
-        if (items.containsKey(Layer.TOP)) {
-            item.setState(CellItemWidget.State.DEFAULT);
-            items.get(Layer.TOP).setState(CellItemWidget.State.SMALL);
-            index = 0;
+        //items.add(item);
+
+        add(item, placeable.getZone());
+
+        applyZOrder();
+
+        repaint();
+        revalidate();
+    }
+
+    private void applyZOrder() {
+
+        List<CellItemWidget> widgets = new ArrayList<>();
+
+        for (Component c : getComponents()) {
+            if (c instanceof CellItemWidget w) {
+                widgets.add(w);
+            }
         }
 
-        items.put(item.getLayer(), item);
-        add(item, index);
+        widgets.sort((a, b) -> Integer.compare(b.getZIndex(), a.getZIndex()));
+        // больший z = выше
+
+        for (int i = 0; i < widgets.size(); i++) {
+            setComponentZOrder(widgets.get(i), i);
+        }
     }
 
     /**
@@ -76,26 +99,42 @@ public class CellWidget extends JPanel {
      *
      * @param item удаляемый виджет.
      */
+//    public void removeItem(CellItemWidget item) {
+//        if (items.containsValue(item)) {
+//            int index = 0;
+//
+//            if (item.getLayer() == Layer.BOTTOM) {
+//                if (items.containsKey(Layer.TOP)) {
+//                    items.get(Layer.TOP).setState(CellItemWidget.State.DEFAULT);
+//                }
+//            }
+//
+//            if (item.getLayer() == Layer.TOP) {
+//                if (items.containsKey(Layer.BOTTOM)) {
+//                    index = 1;
+//                    items.get(Layer.BOTTOM).setState(CellItemWidget.State.DEFAULT);
+//                }
+//            }
+//
+//            remove(index);
+//            items.remove(item.getLayer());
+//            repaint();
+//        }
+//    }
+
     public void removeItem(CellItemWidget item) {
-        if (items.containsValue(item)) {
-            int index = 0;
 
-            if (item.getLayer() == Layer.BOTTOM) {
-                if (items.containsKey(Layer.TOP)) {
-                    items.get(Layer.TOP).setState(CellItemWidget.State.DEFAULT);
-                }
-            }
+        //items.remove(item);
 
-            if (item.getLayer() == Layer.TOP) {
-                if (items.containsKey(Layer.BOTTOM)) {
-                    index = 1;
-                    items.get(Layer.BOTTOM).setState(CellItemWidget.State.DEFAULT);
-                }
-            }
+        remove(item);
 
-            remove(index);
-            items.remove(item.getLayer());
-            repaint();
-        }
+        repaint();
+        revalidate();
     }
+
+//    @Override
+//    public Dimension getPreferredSize() {
+//        return new Dimension(150, 150);
+//    }
+
 }

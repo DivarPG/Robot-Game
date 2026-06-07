@@ -2,11 +2,14 @@ package game.ui;
 
 import game.model.events.*;
 import game.model.field.core.*;
+import game.model.field.core.Point;
+import game.model.field.core.Robot;
 import org.jetbrains.annotations.NotNull;
 import game.ui.obstacle.BetweenCellsWidget;
 import game.ui.cell.*;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class FieldWidget extends JPanel {
 
@@ -53,12 +56,15 @@ public class FieldWidget extends JPanel {
 
             if(i == 0)  {
                 BetweenCellsWidget westCellWidget = widgetFactory.create(cell.getNeighborArea(Direction.WEST));
+                westCellWidget.setAlignmentY(Component.CENTER_ALIGNMENT);
                 row.add(westCellWidget);
             }
 
+            cellWidget.setAlignmentY(Component.CENTER_ALIGNMENT);
             row.add(cellWidget);
 
             BetweenCellsWidget eastCellWidget = widgetFactory.create(cell.getNeighborArea(Direction.EAST));
+            eastCellWidget.setAlignmentY(Component.CENTER_ALIGNMENT);
             row.add(eastCellWidget);
         }
         return row;

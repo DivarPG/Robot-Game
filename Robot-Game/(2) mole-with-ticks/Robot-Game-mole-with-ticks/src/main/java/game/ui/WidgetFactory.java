@@ -8,10 +8,23 @@ import game.model.field.core.ExitPoint;
 import game.model.field.core.*;
 import game.model.field.core.Robot;
 import game.ui.obstacle.BetweenCellsWidget;
+import game.ui.obstacle.wallcomponent.WallBuilder;
+import game.ui.resource.CachedResourceProvider;
+import game.ui.resource.ResourceProvider;
+import game.ui.resource.audio.ClasspathSoundResourceProvider;
+import game.ui.resource.audio.SoundPlayer;
+import game.ui.resource.audio.SoundResource;
+import game.ui.resource.gif.ClasspathGifResourceProvider;
+import game.ui.resource.gif.GifResource;
+import game.ui.resource.image.ClasspathImageResourceProvider;
+import game.ui.resource.image.ImageResource;
 import org.jetbrains.annotations.NotNull;
 import game.ui.cell.*;
 
+import javax.sound.sampled.Clip;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +33,20 @@ public class WidgetFactory {
     private final Map<Cell, CellWidget> cells = new HashMap<>();
     private final Map<CellObject, CellItemWidget> cellObjects = new HashMap<>();
     private final Map<BetweenCellsArea, BetweenCellsWidget> betweenCellsAreas = new HashMap<>();
+
+
+    private final ResourceProvider<BufferedImage, ImageResource> imageResourceProvider =
+            new CachedResourceProvider<>(new ClasspathImageResourceProvider());
+
+    private final ResourceProvider<ImageIcon, GifResource> gifResourceProvider =
+            new CachedResourceProvider<>(new ClasspathGifResourceProvider());
+
+    private final ResourceProvider<Clip, SoundResource> soundResourceProvider =
+            new ClasspathSoundResourceProvider();
+
+    private final SoundPlayer soundPlayer = new  SoundPlayer(soundResourceProvider);
+
+    private final WallBuilder wallBuilder = new WallBuilder(imageResourceProvider);
 
     /*---------- Cell ----------*/
     public CellWidget create(@NotNull Cell cell) {
@@ -69,13 +96,13 @@ public class WidgetFactory {
 
         CellItemWidget createdWidget = null;
         if (cellObject instanceof Robot) {
-            createdWidget = new RobotWidget((Robot) cellObject, Color.BLUE);
+            createdWidget = new RobotWidget((Robot) cellObject, imageResourceProvider, soundPlayer);
         } else if (cellObject instanceof Battery) {
-            createdWidget = new BatteryWidget((Battery) cellObject);
+            createdWidget = new BatteryWidget((Battery) cellObject, imageResourceProvider);
         } else if (cellObject instanceof ExitPoint) {
-            createdWidget = new ExitWidget();
+            createdWidget = new ExitWidget((ExitPoint)cellObject,gifResourceProvider, soundPlayer);
         } else if (cellObject instanceof Hole) {
-            createdWidget = new HoleWidget();
+            createdWidget = new HoleWidget(gifResourceProvider);
         } else {
             throw new IllegalArgumentException();
         }
@@ -97,6 +124,10 @@ public class WidgetFactory {
         if (betweenCellsAreas.containsKey(betweenCellsArea)) return betweenCellsAreas.get(betweenCellsArea);
 
         BetweenCellsWidget createdWidget = new BetweenCellsWidget(betweenCellsArea);
+
+        if (betweenCellsArea.getObstacle() != null) {
+            wallBuilder.build(betweenCellsArea, createdWidget, this);
+        }
 
         betweenCellsAreas.put(betweenCellsArea, createdWidget);
         return createdWidget;
