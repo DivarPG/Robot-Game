@@ -11,7 +11,7 @@ import game.ui.resource.gif.ClasspathGifResourceProvider;
 import game.ui.resource.gif.GifResource;
 import game.ui.resource.image.ClasspathImageResourceProvider;
 import game.ui.resource.image.ImageResource;
-import game.ui.utils.SoundPlayer;
+import game.ui.resource.audio.SoundPlayer;
 import org.jetbrains.annotations.NotNull;
 import game.ui.cell.*;
 

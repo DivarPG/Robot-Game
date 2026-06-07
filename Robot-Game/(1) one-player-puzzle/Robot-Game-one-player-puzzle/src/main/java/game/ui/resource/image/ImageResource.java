@@ -9,6 +9,7 @@ public enum ImageResource implements ResourceDescriptor {
 
     // изображение робота
     ROBOT("robot/Robot.png"),
+    ROBOT_PICK_BATTERY("robot/Robot_pick_battery.png"),
 
     // изображение батарейки
     BATTERY_FULL("battery/Battery_green.png"),

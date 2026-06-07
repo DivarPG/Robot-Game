@@ -6,7 +6,7 @@ import game.model.field.core.ExitPoint;
 import game.ui.resource.ResourceProvider;
 import game.ui.resource.audio.SoundResource;
 import game.ui.resource.gif.GifResource;
-import game.ui.utils.SoundPlayer;
+import game.ui.resource.audio.SoundPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;

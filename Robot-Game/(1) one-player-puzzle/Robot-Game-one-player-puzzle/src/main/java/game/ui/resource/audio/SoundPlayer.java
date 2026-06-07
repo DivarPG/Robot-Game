@@ -1,8 +1,7 @@
-package game.ui.utils;
+package game.ui.resource.audio;
 
 import game.ui.resource.ResourceProvider;
-import game.ui.resource.audio.ClasspathSoundResourceProvider;
-import game.ui.resource.audio.SoundResource;
+
 import javax.sound.sampled.Clip;
 
 public class SoundPlayer {

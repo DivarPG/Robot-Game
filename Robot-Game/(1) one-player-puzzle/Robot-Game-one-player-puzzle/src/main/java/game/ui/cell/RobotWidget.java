@@ -9,12 +9,13 @@ import game.ui.utils.ChargeColorResolver;
 import game.ui.resource.image.ImageResource;
 import game.ui.utils.ImageScaler;
 import game.ui.resource.ResourceProvider;
-import game.ui.utils.SoundPlayer;
+import game.ui.resource.audio.SoundPlayer;
 import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import javax.swing.Timer;
 
 /**
  * Виджет робота.
@@ -22,11 +23,25 @@ import java.awt.image.BufferedImage;
  * @see Robot
  */
 public class RobotWidget extends CellItemWidget {
+    // можно добавить вынести класс для состояний робота - а этот бы только запршибал  какое и отрисовывал
+    // иначе респонсибилити разъезжается немного
+
+    private enum State{
+        IDLE,
+        TELEPORTED,
+        PICK_BATTERY
+    }
 
     /**
      * Робот.
      */
     private final Robot robot;
+
+    private State state = State.IDLE;
+
+    private int rotationAngle = 0;
+
+    private Timer animationTimer;
 
     /**
      * Размер элемента.
@@ -47,14 +62,18 @@ public class RobotWidget extends CellItemWidget {
         this.imageProvider = imageProvider;
         setMouseTransparent(false);
 
+        setState(State.IDLE);
+
         robot.addRobotActionListener(new RobotActionListener() {
             @Override
             public void robotIsMoved(@NotNull RobotActionEvent event) {
+                setState(State.IDLE);
                 soundPlayer.playSound(SoundResource.MOVE);
             }
 
             @Override
             public void robotChangedBattery(@NotNull RobotActionEvent event) {
+                setState( State.PICK_BATTERY);
                 soundPlayer.playSound(SoundResource.PICK_BATTERY);
             }
 
@@ -68,16 +87,24 @@ public class RobotWidget extends CellItemWidget {
     }
 
 
-    private BufferedImage getImage( ) {
-        BufferedImage original = imageProvider.get(getImageType());
+    private BufferedImage getImage(ImageResource imageType) {
+        BufferedImage original = imageProvider.get(imageType);
         return ImageScaler.resize(original, 110, 110);
     }
 
     @Override
     protected void draw(Graphics g) {
+        switch (state){
+            case IDLE -> drawForType(g, ImageResource.ROBOT);
+            case PICK_BATTERY -> drawForType(g, ImageResource.ROBOT_PICK_BATTERY);
+            case TELEPORTED -> drawTeleportedState(g); // не вызывается - в модели нет события на телепортацию робота у слуштелей робота
+            // можно запускать через получение ивента через поле или через сам exitWidget (не оч слишком большое знание о других чуваках)
+            // или можно сделать открытый метод на смену состояния (на сост телепортация) и вызывать его в поле в оброботчике события телепортации
+        }
+    }
 
-        BufferedImage img = getImage();
-
+    protected void drawForType(Graphics g, ImageResource imageType){
+        BufferedImage img = getImage(imageType);
 
         int cw = getWidth();
         int ch = getHeight();
@@ -98,9 +125,82 @@ public class RobotWidget extends CellItemWidget {
         );
     }
 
-    private ImageResource getImageType() {
-        return ImageResource.ROBOT;
+    protected void drawTeleportedState(Graphics g){
+        BufferedImage img = getImage(ImageResource.ROBOT);
+
+        int x = (getWidth() - img.getWidth()) / 2;
+        int y = (getHeight() - img.getHeight()) / 2;
+
+        Graphics2D g2 = (Graphics2D) g.create();
+
+        int centerX = x + img.getWidth() / 2;
+        int centerY = y + img.getHeight() / 2;
+
+        g2.rotate(
+                Math.toRadians(rotationAngle),
+                centerX,
+                centerY
+        );
+
+        g2.drawImage(
+                img,
+                x,
+                y,
+                null
+        );
+
+        g2.dispose();
     }
+
+    private void setState(State newState) {
+
+        if (animationTimer != null) {
+            animationTimer.stop();
+        }
+
+        state = newState;
+
+        switch (newState) {
+
+            case IDLE -> {
+                rotationAngle = 0;
+            }
+
+            case PICK_BATTERY -> {
+
+                animationTimer = new Timer(400, e -> {
+                    setState(State.IDLE);
+                });
+
+                animationTimer.setRepeats(false);
+                animationTimer.start();
+            }
+
+            case TELEPORTED -> {
+
+                rotationAngle = 0;
+
+                animationTimer = new Timer(16, e -> {
+
+                    rotationAngle += 15;
+
+                    repaint();
+
+                    if (rotationAngle >= 720) {
+
+                        //((Timer)e.getSource()).stop();
+
+                        setState(State.IDLE);
+                    }
+                });
+
+                animationTimer.start();
+            }
+        }
+
+        repaint();
+    }
+
 
     /**
      * Сделать виджет активным
@@ -138,11 +238,6 @@ public class RobotWidget extends CellItemWidget {
     }
 
     @Override
-    public int getZIndex() {
-        return 100;
-    }
-
-    @Override
     protected void drawOverlay(Graphics g) {
 
         Graphics2D g2 = (Graphics2D) g;
@@ -159,6 +254,11 @@ public class RobotWidget extends CellItemWidget {
         g2.setColor(robotChargeTextColor());
 
         g2.drawString(text, x, y+5);
+    }
+
+    @Override
+    public int getZIndex() {
+        return 100;
     }
 
     @Override
@@ -208,4 +308,6 @@ public class RobotWidget extends CellItemWidget {
             };
         }
     }
+
+
 }
