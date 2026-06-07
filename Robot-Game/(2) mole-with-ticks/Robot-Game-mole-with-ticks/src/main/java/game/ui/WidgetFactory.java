@@ -102,7 +102,7 @@ public class WidgetFactory {
         } else if (cellObject instanceof ExitPoint) {
             createdWidget = new ExitWidget((ExitPoint)cellObject,gifResourceProvider, soundPlayer);
         } else if (cellObject instanceof Hole) {
-            createdWidget = new HoleWidget(gifResourceProvider);
+            createdWidget = new HoleWidget(gifResourceProvider, imageResourceProvider);
         } else {
             throw new IllegalArgumentException();
         }
