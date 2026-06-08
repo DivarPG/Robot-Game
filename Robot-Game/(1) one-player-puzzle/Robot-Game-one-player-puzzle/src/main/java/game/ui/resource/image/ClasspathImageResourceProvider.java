@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 
+/**
+ * Поставщик графических ресурсов из classpath
+ */
 public class ClasspathImageResourceProvider implements ResourceProvider<BufferedImage, ImageResource> {
 
 //    private static final String ROOT = "src/main/resources/image/";
@@ -24,6 +27,13 @@ public class ClasspathImageResourceProvider implements ResourceProvider<Buffered
 //        return image;
 //    }
 
+    /**
+     * Загрузить изображение
+     *
+     * @param res дескриптор графического ресурса
+     * @return загруженное изображение
+     * @throws IllegalStateException если ресурс не удалось загрузить
+     */
     @Override
     public BufferedImage get(@NotNull ImageResource res) {
 

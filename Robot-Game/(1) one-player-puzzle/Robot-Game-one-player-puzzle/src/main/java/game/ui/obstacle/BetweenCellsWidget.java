@@ -13,7 +13,7 @@ import java.awt.*;
 public class BetweenCellsWidget extends JPanel {
 
     /**
-     * Ориентация.
+     * Ориентация области между ячейками
      */
     private final Orientation orientation;
 
@@ -25,9 +25,9 @@ public class BetweenCellsWidget extends JPanel {
     private static final Dimension SIZE_VERTICAL = new Dimension(5, 5);
 
     /**
-     * Конструктор.
+     * Конструктор
      *
-     * @param betweenCellsArea область между клетками.
+     * @param betweenCellsArea модель области между соседними ячейками
      */
     public BetweenCellsWidget(@NotNull BetweenCellsArea betweenCellsArea) {
         super(new BorderLayout());
@@ -41,6 +41,11 @@ public class BetweenCellsWidget extends JPanel {
 
     }
 
+    /**
+     * Установить препятствие
+     *
+     * @param obstacleWidget виджет препятствия
+     */
     public void setObstacle(@NotNull ObstacleWidget obstacleWidget) {
         setItem(obstacleWidget);
 

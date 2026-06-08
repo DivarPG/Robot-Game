@@ -6,9 +6,17 @@ import javax.swing.*;
 import java.net.URL;
 import java.util.Objects;
 
-
+/**
+ * Поставщик GIF-ресурсов из classpath
+ */
 public class ClasspathGifResourceProvider implements ResourceProvider<ImageIcon, GifResource> {
 
+    /**
+     * Загрузить GIF-ресурс
+     *
+     * @param res дескриптор GIF-ресурса
+     * @return загруженное изображение
+     */
     @Override
     public ImageIcon get(@NotNull GifResource res) {
 

@@ -27,12 +27,16 @@ public class BatteryWidget extends CellItemWidget {
      */
     private static final Dimension SIZE = new Dimension(90, 90);
 
+    /**
+     * Поставщик изображений
+     */
     private final  ResourceProvider<BufferedImage,ImageResource> imageProvider;
 
     /**
      * Конструктор.
      *
-     * @param battery источник питания.
+     * @param battery источник питания
+     * @param imageProvider провайдер изображений
      */
     public BatteryWidget(@NotNull Battery battery, @NotNull ResourceProvider<BufferedImage, ImageResource> imageProvider) {
 
@@ -46,20 +50,32 @@ public class BatteryWidget extends CellItemWidget {
         setToolTipText("Заряд: " + battery.getCharge() + "/" + battery.getCapacity());
     }
 
+    @Override
+    public CellLayout.Zone getZone() {
+        return CellLayout.Zone.SECONDARY;
+    }
 
     @Override
     public int getZIndex() {
         return 10;
     }
 
-
-    public BufferedImage getImage() {
+    /**
+     * Получить изображение батареи
+     *
+     * @return изображение батареи
+     */
+    protected BufferedImage getImage() {
         BufferedImage original = imageProvider.get(getImageType());
         return ImageScaler.resize(original,120,100);
     }
 
-
-    public ImageResource getImageType() {
+    /**
+     * Получить тип изображения в зависимости от уровня заряда
+     *
+     * @return тип изображения батареи
+     */
+    protected ImageResource getImageType() {
         double percent = (double) battery.getCharge() / battery.getCapacity();
 
         if (percent > 0.66) {
@@ -152,9 +168,4 @@ public class BatteryWidget extends CellItemWidget {
         return SIZE;
     }
 
-
-    @Override
-    public CellLayout.Zone getZone() {
-        return CellLayout.Zone.SECONDARY;
-    }
 }

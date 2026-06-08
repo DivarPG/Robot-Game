@@ -15,10 +15,6 @@ import java.util.List;
 
 public class CellWidget extends JPanel {
 
-
-    // не оч!!! - добавить валлидацию по списку
-    List<CellItemWidget> items = new ArrayList<>();
-
     /**
      * Размер виджета ячейки.
      */
@@ -38,28 +34,16 @@ public class CellWidget extends JPanel {
         setOpaque(true);
     }
 
-
     /**
-     * Добавить элемент в виджет ячейки.
+     * Добавить элемент в ячейку.
+     * Элемент размещается в зоне, определяемой интерфейсом
+     * {@link Placeable}, после чего порядок отображения
+     * пересчитывается в соответствии со значением z-index.
      *
-     * @param item виджет объекта для ячейки.
-     * @throws IllegalArgumentException если объектов добавляется больше 2.
+     * @param item добавляемый элемент.
+     * @throws IllegalArgumentException если элемент не поддерживает
+     *         размещение в зонах ячейки.
      */
-
-//    public void addItem(CellItemWidget item) {
-//
-//        Dimension size = item.getDimension();
-//
-//        item.setBounds(0, 0, size.width, size.height);
-//
-//        add(item, Integer.valueOf(item.getZIndex()));
-//
-//        repaint();
-//        revalidate();
-//    }
-
-
-
     public void addItem(CellItemWidget item) {
 
         if (!(item instanceof Placeable placeable)) {
@@ -76,6 +60,26 @@ public class CellWidget extends JPanel {
         revalidate();
     }
 
+    /**
+     * Удалить виджет из ячейки.
+     *
+     * @param item удаляемый виджет.
+     */
+    public void removeItem(CellItemWidget item) {
+
+        //items.remove(item);
+
+        remove(item);
+
+        repaint();
+        revalidate();
+    }
+
+    /**
+     * Обновить порядок отображения элементов ячейки.
+     * Элементы с большим значением z-index отображаются поверх
+     * элементов с меньшим значением.
+     */
     private void applyZOrder() {
 
         List<CellItemWidget> widgets = new ArrayList<>();
@@ -87,49 +91,10 @@ public class CellWidget extends JPanel {
         }
 
         widgets.sort((a, b) -> Integer.compare(b.getZIndex(), a.getZIndex()));
-        // больший z = выше
 
         for (int i = 0; i < widgets.size(); i++) {
             setComponentZOrder(widgets.get(i), i);
         }
-    }
-
-    /**
-     * Удалить виджет из ячейки.
-     *
-     * @param item удаляемый виджет.
-     */
-//    public void removeItem(CellItemWidget item) {
-//        if (items.containsValue(item)) {
-//            int index = 0;
-//
-//            if (item.getLayer() == Layer.BOTTOM) {
-//                if (items.containsKey(Layer.TOP)) {
-//                    items.get(Layer.TOP).setState(CellItemWidget.State.DEFAULT);
-//                }
-//            }
-//
-//            if (item.getLayer() == Layer.TOP) {
-//                if (items.containsKey(Layer.BOTTOM)) {
-//                    index = 1;
-//                    items.get(Layer.BOTTOM).setState(CellItemWidget.State.DEFAULT);
-//                }
-//            }
-//
-//            remove(index);
-//            items.remove(item.getLayer());
-//            repaint();
-//        }
-//    }
-
-    public void removeItem(CellItemWidget item) {
-
-        //items.remove(item);
-
-        remove(item);
-
-        repaint();
-        revalidate();
     }
 
 //    @Override

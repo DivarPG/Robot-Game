@@ -4,20 +4,26 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-
-// * делится на три зоны зоны - основную (одна), вторичную (одня) и стенную (четыре)
-// *
-//         * основная
-// * - зона для основных элементов клетки (робот, портал)
-// *
-//         * вторичная
-// *  - зона для предметов (батарейка)
-// *
-//         *  стенная
-// *  - зона для компонентов межкклеточных элементов (стены)
-
+/**
+ * Менеджер компоновки для содержимого ячейки игрового поля
+ * Размещает компоненты по заранее определенным зонам:
+ * <ul>
+ *     <li>{@link Zone#PRIMARY} — основная область ячейки
+ *     для игровых объектов (например, робота или выхода);</li>
+ *
+ *     <li>{@link Zone#SECONDARY} — дополнительная область
+ *     для предметов, расположенных в ячейке;</li>
+ *
+ *     <li>{@link Zone#WALL_TOP}, {@link Zone#WALL_BOTTOM},
+ *     {@link Zone#WALL_LEFT}, {@link Zone#WALL_RIGHT} —
+ *     области для отображения компонентов межклеточных препятствий.</li>
+ * </ul>
+ */
 public class CellLayout implements LayoutManager2 {
 
+    /**
+     * Область размещения компонента внутри ячейки
+     */
     public enum Zone {
         PRIMARY,
         SECONDARY,
@@ -54,10 +60,10 @@ public class CellLayout implements LayoutManager2 {
 
             Rectangle bounds = getBounds(entry.getValue(), w, h);
 
-            Dimension pref = c.getPreferredSize();
+//            Dimension pref = c.getPreferredSize();
 
-            int x = bounds.x + (bounds.width - pref.width) / 2;
-            int y = bounds.y + (bounds.height - pref.height) / 2;
+//            int x = bounds.x + (bounds.width - pref.width) / 2;
+//            int y = bounds.y + (bounds.height - pref.height) / 2;
 
             //c.setBounds(x, y, bounds.width,bounds.height);
             c.setBounds(bounds);

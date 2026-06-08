@@ -6,6 +6,9 @@ import javax.sound.sampled.*;
 import java.net.URL;
 import java.util.Objects;
 
+/**
+ * Поставщик звуковых ресурсов из classpath
+ */
 public class ClasspathSoundResourceProvider implements ResourceProvider<Clip, SoundResource> {
 
 //    private static final String ROOT = "src/main/resources/audio/";
@@ -26,6 +29,14 @@ public class ClasspathSoundResourceProvider implements ResourceProvider<Clip, So
 //        }
 //    }
 
+
+    /**
+     * Загрузить звуковой ресурс
+     *
+     * @param res дескриптор звукового ресурса
+     * @return загруженный звуковой клип
+     * @throws IllegalStateException если ресурс не удалось загрузить
+     */
     @Override
     public Clip get(@NotNull SoundResource res) {
 

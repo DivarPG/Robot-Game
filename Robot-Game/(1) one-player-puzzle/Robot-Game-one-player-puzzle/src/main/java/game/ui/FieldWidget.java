@@ -4,22 +4,37 @@ import game.model.events.*;
 import game.model.field.core.*;
 import game.model.field.core.Point;
 import game.model.field.core.Robot;
-import game.ui.resource.CachedResourceProvider;
-import game.ui.resource.ResourceProvider;
-import game.ui.resource.audio.ClasspathSoundResourceProvider;
-import game.ui.resource.audio.SoundResource;
 import org.jetbrains.annotations.NotNull;
 import game.ui.obstacle.BetweenCellsWidget;
 import game.ui.cell.*;
-import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Основной виджет игрового поля
+ * Отвечает за построение UI представления модели {@link Field}
+ * и синхронизацию изменений модели с визуальным слоем
+ *
+ * Поле состоит из строк клеток и промежуточных (межклеточных) зон между ними
+ */
 public class FieldWidget extends JPanel {
 
+    /**
+     * Игровое поле (модель)
+     */
     private final Field field;
+
+    /**
+     * Фабрика виджетов
+     */
     private final WidgetFactory widgetFactory;
 
+    /**
+     * Конструктор
+     *
+     * @param field игровое поле (модель)
+     * @param widgetFactory фабрика UI-виджетов для элементов поля
+     */
     public FieldWidget(@NotNull Field field, @NotNull  WidgetFactory widgetFactory) {
         this.field = field;
         this.widgetFactory = widgetFactory;
@@ -30,6 +45,14 @@ public class FieldWidget extends JPanel {
         field.addFieldActionListener(new FieldController());
     }
 
+    /**
+     * Построить визуальное представление всего игрового поля
+     *
+     * Создает:
+     * - строки клеток
+     * - промежуточные зоны между клетками
+     * - верхние и нижние границы (стены)
+     */
     private void fillField() {
 
         if(field.getHeight() > 0) {
@@ -43,11 +66,6 @@ public class FieldWidget extends JPanel {
 
             JPanel row = createRow(i);
 
-            // детектор полосы
-            row.setBackground(Color.MAGENTA);
-            row.setOpaque(true);
-
-
             add(row);
             JPanel rowWalls = createRowWalls(i, Direction.SOUTH);
             add(rowWalls);
@@ -56,7 +74,16 @@ public class FieldWidget extends JPanel {
     }
 
 
-
+    /**
+     * Создать визуальную строку клеток поля
+     *
+     * Включает:
+     * - клетки {@link Cell}
+     * - боковые и межклеточные зоны {@link BetweenCellsWidget}
+     *
+     * @param rowIndex индекс строки
+     * @return панель строки
+     */
     private JPanel createRow(int rowIndex) {
         JPanel row = new JPanel();
         row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
@@ -87,13 +114,23 @@ public class FieldWidget extends JPanel {
 
             eastCellWidget.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-            //ТОЧКА ПРОБЛЕМ
             row.add(eastCellWidget);
 
         }
         return row;
     }
 
+    /**
+     * Создать горизонтальный ряд межклеточных зон (стен)
+     *
+     * Используется для верхней и нижней границы поля
+     *
+     * @param rowIndex индекс строки
+     * @param direction направление стен (NORTH или SOUTH)
+     * @return панель с wall-зонами
+     *
+     * @throws IllegalArgumentException если direction не NORTH/SOUTH
+     */
     private JPanel createRowWalls(int rowIndex, Direction direction) {
 
         if(direction == Direction.EAST || direction == Direction.WEST) throw new IllegalArgumentException();
@@ -116,11 +153,17 @@ public class FieldWidget extends JPanel {
         return row;
     }
 
+    /**
+     * Подписать UI на события робота из модели поля
+     */
     private void subscribeOnRobots() {
         Robot robot = field.getRobot();
         robot.addRobotActionListener(new RobotController());
     }
 
+    /**
+     * Обработчик событий робота
+     */
     private class RobotController implements RobotActionListener {
 
         @Override
@@ -145,6 +188,9 @@ public class FieldWidget extends JPanel {
         }
     }
 
+    /**
+     * Обработчик событий поля
+     */
     private class FieldController implements FieldActionListener {
 
         @Override

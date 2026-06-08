@@ -20,9 +20,18 @@ import java.awt.*;
 
 public class ExitWidget extends CellItemWidget {
 
-    // лучше хранить через провайдера или через ресурс ?
-    private final ImageIcon gif;
+    /**
+     * Анимация портала.
+     */
+    private final ImageIcon gif; // лучше хранить через провайдера или через ресурс ?
 
+    /**
+     * Конструктор.
+     *
+     * @param exitPoint модель точки выхода.
+     * @param provider поставщик анимации портала.
+     * @param soundPlayer проигрыватель звуковых эффектов.
+     */
     public ExitWidget( ExitPoint exitPoint,
             ResourceProvider<ImageIcon, GifResource> provider, SoundPlayer soundPlayer ){
 

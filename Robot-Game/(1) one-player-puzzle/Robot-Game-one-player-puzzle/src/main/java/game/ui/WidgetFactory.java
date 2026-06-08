@@ -14,13 +14,21 @@ import game.ui.resource.image.ImageResource;
 import game.ui.resource.audio.SoundPlayer;
 import org.jetbrains.annotations.NotNull;
 import game.ui.cell.*;
-
 import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Фабрика UI-виджетов игрового поля.
+ *
+ * Создает и кеширует Swing-виджеты, соответствующие объектам модели:
+ *
+ * - {@link Cell} -> {@link CellWidget}
+ * - {@link CellObject} -> {@link CellItemWidget} (Robot, Battery, ExitPoint)
+ * - {@link BetweenCellsArea} -> {@link BetweenCellsWidget}
+ */
 public class WidgetFactory {
 
     private final Map<Cell, CellWidget> cells = new HashMap<>();

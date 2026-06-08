@@ -5,7 +5,6 @@ import javax.swing.*;
 import java.awt.*;
 
 
-
 /**
  * Виджет препятствия, расположенного между ячейками.
  */
@@ -15,7 +14,6 @@ public abstract class ObstacleWidget extends JPanel {
      * Ориентация.
      */
     protected final Orientation orientation;
-
 
     /**
      * Размер элемента.
@@ -45,12 +43,6 @@ public abstract class ObstacleWidget extends JPanel {
         setOpaque(false);
     }
 
-//    @Override
-//    protected void paintComponent(Graphics g) {
-//        super.paintComponent(g);
-//        g.drawImage(getImage(provider), 0, 0, null);
-//    }
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -60,8 +52,12 @@ public abstract class ObstacleWidget extends JPanel {
         }
     }
 
+    /**
+     * Отрисовать препятствие
+     *
+     * @param g графический контекст
+     */
     protected abstract void draw(Graphics g);
-
 
     /**
      * Получить размеры виджеты по ориентации.

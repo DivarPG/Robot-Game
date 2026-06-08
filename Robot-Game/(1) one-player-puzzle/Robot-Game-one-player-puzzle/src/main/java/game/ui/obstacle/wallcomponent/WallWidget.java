@@ -13,12 +13,16 @@ import java.awt.image.BufferedImage;
  */
 public class WallWidget extends ObstacleWidget {
 
-
+    /**
+     * Поставщик изображений
+     */
     private final  ResourceProvider<BufferedImage,ImageResource> imageProvider;
 
     /**
      * Конструктор.
-     * @param orientation ориентация.
+     *
+     * @param orientation ориентация стены
+     * @param imageProvider поставщик изображений
      */
     public WallWidget( Orientation orientation, ResourceProvider<BufferedImage,ImageResource> imageProvider) {
 
@@ -31,19 +35,13 @@ public class WallWidget extends ObstacleWidget {
         BufferedImage img = getImage();
 
         g.drawImage(img, 0, 0, null);
-
     }
-
 
     private BufferedImage getImage() {
 
-        BufferedImage original = imageProvider.get(getImageType());
-
         //BufferedImage resized =ImageUtils.resizeImage(original, 120, 120);
-
-        return original;
+        return imageProvider.get(getImageType());
     }
-
 
     private ImageResource getImageType() {
         return (orientation == Orientation.VERTICAL) ? ImageResource.WALL_VERTICAL : ImageResource.WALL_HORIZONTAL;

@@ -26,6 +26,9 @@ public class RobotWidget extends CellItemWidget {
     // можно добавить вынести класс для состояний робота - а этот бы только запршибал  какое и отрисовывал
     // иначе респонсибилити разъезжается немного
 
+    /**
+     * Визуальное состояние робота.
+     */
     private enum State{
         IDLE,
         TELEPORTED,
@@ -37,10 +40,19 @@ public class RobotWidget extends CellItemWidget {
      */
     private final Robot robot;
 
+    /**
+     * Текущее визуальное состояние робота.
+     */
     private State state = State.IDLE;
 
+    /**
+     * Угол поворота анимации телепортации.
+     */
     private int rotationAngle = 0;
 
+    /**
+     * Таймер текущей анимации.
+     */
     private Timer animationTimer;
 
     /**
@@ -48,12 +60,17 @@ public class RobotWidget extends CellItemWidget {
      */
     private static final Dimension SIZE = new Dimension(120, 120);
 
+    /**
+     * Поставщик изображений
+     */
     private final  ResourceProvider<BufferedImage,ImageResource> imageProvider;
 
     /**
-     * Конструтор.
+     * Конструктор.
      *
-     * @param robot робот.
+     * @param robot модель робота.
+     * @param imageProvider поставщик изображений.
+     * @param soundPlayer проигрыватель звуковых эффектов.
      */
     public RobotWidget(Robot robot, ResourceProvider<BufferedImage,ImageResource> imageProvider, SoundPlayer soundPlayer) {
         super();
@@ -86,10 +103,14 @@ public class RobotWidget extends CellItemWidget {
 //        setBackground(Color.BLACK);
     }
 
+    @Override
+    public int getZIndex() {
+        return 100;
+    }
 
-    private BufferedImage getImage(ImageResource imageType) {
-        BufferedImage original = imageProvider.get(imageType);
-        return ImageScaler.resize(original, 110, 110);
+    @Override
+    public CellLayout.Zone getZone() {
+        return CellLayout.Zone.PRIMARY;
     }
 
     @Override
@@ -101,6 +122,25 @@ public class RobotWidget extends CellItemWidget {
             // можно запускать через получение ивента через поле или через сам exitWidget (не оч слишком большое знание о других чуваках)
             // или можно сделать открытый метод на смену состояния (на сост телепортация) и вызывать его в поле в оброботчике события телепортации
         }
+    }
+
+    @Override
+    protected void drawOverlay(Graphics g) {
+
+        Graphics2D g2 = (Graphics2D) g;
+
+        g2.setFont(new Font("Arial", Font.BOLD, 20));
+
+        String text = robotChargeText();
+
+        FontMetrics metrics = g2.getFontMetrics();
+
+        int x = (getWidth() - metrics.stringWidth(text)) / 2;
+        int y = getHeight() / 2;
+
+        g2.setColor(robotChargeTextColor());
+
+        g2.drawString(text, x, y+5);
     }
 
     protected void drawForType(Graphics g, ImageResource imageType){
@@ -152,6 +192,18 @@ public class RobotWidget extends CellItemWidget {
         g2.dispose();
     }
 
+
+    private BufferedImage getImage(ImageResource imageType) {
+        BufferedImage original = imageProvider.get(imageType);
+        return ImageScaler.resize(original, 110, 110);
+    }
+
+    /**
+     * Изменить визуальное состояние робота.
+     * При необходимости запускает соответствующую анимацию.
+     *
+     * @param newState новое состояние.
+     */
     private void setState(State newState) {
 
         if (animationTimer != null) {
@@ -235,35 +287,6 @@ public class RobotWidget extends CellItemWidget {
      */
     private Color robotChargeTextColor() {
         return ChargeColorResolver.resolve(robot.getCharge(),robot.getChargeCapacity());
-    }
-
-    @Override
-    protected void drawOverlay(Graphics g) {
-
-        Graphics2D g2 = (Graphics2D) g;
-
-        g2.setFont(new Font("Arial", Font.BOLD, 20));
-
-        String text = robotChargeText();
-
-        FontMetrics metrics = g2.getFontMetrics();
-
-        int x = (getWidth() - metrics.stringWidth(text)) / 2;
-        int y = getHeight() / 2;
-
-        g2.setColor(robotChargeTextColor());
-
-        g2.drawString(text, x, y+5);
-    }
-
-    @Override
-    public int getZIndex() {
-        return 100;
-    }
-
-    @Override
-    public CellLayout.Zone getZone() {
-        return CellLayout.Zone.PRIMARY;
     }
 
     /**

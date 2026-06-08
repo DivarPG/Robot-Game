@@ -157,6 +157,10 @@ public class RobotWidget extends CellItemWidget {
         g2.dispose();
     }
 
+    public void setTeleportedState(){
+        setState(State.TELEPORTED);
+    }
+
     private void setState(State newState) {
 
         if (animationTimer != null) {
